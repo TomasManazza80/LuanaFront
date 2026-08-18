@@ -251,84 +251,84 @@ const AppointmentCalendar = () => {
     };
 
     return (
-        <div className="w-full flex flex-col h-full bg-white p-4 md:p-8 relative">
+        <div className="w-full max-w-full overflow-x-hidden flex flex-col h-full bg-white p-3 md:p-5 relative">
             {/* Header Area */}
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-3xl font-bold tracking-tight text-[#1E293B]">Turnos</h1>
+            <div className="flex justify-between items-center mb-4">
+                <h1 className="text-xl md:text-2xl font-bold tracking-tight text-[#1E293B]">Turnos</h1>
                 <button
                     onClick={() => setIsModalOpen(true)}
-                    className="bg-[#3B82F6] hover:bg-blue-600 text-white px-5 py-2.5 rounded-full font-semibold shadow-sm transition-all flex items-center gap-2 text-sm"
+                    className="bg-[#3B82F6] hover:bg-blue-600 text-white px-4 py-2 rounded-full font-semibold shadow-sm transition-all flex items-center gap-1.5 text-xs"
                 >
                     <span>+</span> Nuevo Turno
                 </button>
             </div>
 
             {/* Toolbar Area */}
-            <div className="flex flex-wrap justify-between items-center mb-8 gap-4 border-b border-gray-100 pb-4">
-                <div className="flex items-center gap-3 relative">
+            <div className="flex flex-wrap justify-between items-center mb-4 gap-2.5 border-b border-gray-100 pb-3">
+                <div className="flex flex-wrap items-center gap-2 relative">
                     <button
                         onClick={() => setStatusFilter(statusFilter ? '' : 'confirmado')}
-                        className={`flex items-center gap-2 px-4 py-2 border rounded-full text-sm font-medium transition-colors ${statusFilter ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'}`}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 border rounded-full text-xs font-medium transition-colors ${statusFilter ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'}`}
                     >
-                        <Filter size={16} /> {statusFilter ? 'Solo Confirmados' : 'Filtro'}
+                        <Filter size={14} /> {statusFilter ? 'Solo Confirmados' : 'Filtro'}
                     </button>
                     <button
                         onClick={() => setViewMode(viewMode === 'Semanal' ? 'Diario' : 'Semanal')}
-                        className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors w-[120px] justify-center"
+                        className="flex items-center gap-1 px-3 py-1.5 bg-white border border-gray-200 rounded-full text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors justify-center min-w-[100px]"
                     >
-                        <CalendarDays size={16} /> {viewMode} <ChevronDown size={14} className="ml-1" />
+                        <CalendarDays size={14} /> {viewMode} <ChevronDown size={12} className="ml-1" />
                     </button>
                     <button
                         onClick={() => setIsListModalOpen(true)}
-                        className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 rounded-full text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors"
                     >
-                        <List size={16} /> Ver listado
+                        <List size={14} /> Ver listado
                     </button>
                     <button
                         onClick={() => navigate('/historial-turnos')}
-                        className="flex items-center gap-2 px-4 py-2 bg-[#0A58CA] border border-blue-600 rounded-full text-sm font-medium text-white hover:bg-blue-700 transition-colors shadow-sm"
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-[#0A58CA] border border-blue-600 rounded-full text-xs font-medium text-white hover:bg-blue-700 transition-colors shadow-sm"
                     >
-                        <History size={16} /> Historial Turnos
+                        <History size={14} /> Historial Turnos
                     </button>
                 </div>
-                <div className="flex items-center gap-4 relative">
+                <div className="flex flex-wrap items-center gap-2 relative">
                     {isSearchOpen && (
                         <input
                             type="text"
                             placeholder="Buscar cliente..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="absolute right-[240px] px-3 py-1.5 border border-gray-200 rounded-full text-sm outline-none focus:border-[#0a47d4] shadow-sm animate-in fade-in slide-in-from-right-4 w-[200px]"
+                            className="px-2.5 py-1 border border-gray-200 rounded-full text-xs outline-none focus:border-[#0a47d4] shadow-sm animate-in fade-in slide-in-from-right-4 w-[160px]"
                             autoFocus
                         />
                     )}
                     <button
                         onClick={() => setIsSearchOpen(!isSearchOpen)}
-                        className={`p-2 rounded-full transition-colors ${isSearchOpen ? 'bg-blue-50 text-blue-600' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'}`}
+                        className={`p-1.5 rounded-full transition-colors ${isSearchOpen ? 'bg-blue-50 text-blue-600' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'}`}
                     >
-                        <Search size={20} />
+                        <Search size={16} />
                     </button>
-                    <div className="w-px h-5 bg-gray-200"></div>
+                    <div className="w-px h-4 bg-gray-200"></div>
                     <button
                         onClick={() => window.open('https://wa.me/3245937358', '_blank')}
-                        className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-700 hover:border-green-200 transition-colors"
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 rounded-full text-xs font-medium text-gray-700 hover:bg-green-50 hover:text-green-700 hover:border-green-200 transition-colors"
                     >
-                        <HeadphonesIcon size={16} /> Soporte
+                        <HeadphonesIcon size={14} /> Soporte
                     </button>
                     <button
                         onClick={() => setIsCompact(!isCompact)}
-                        className={`flex items-center gap-2 px-4 py-2 border rounded-full text-sm font-medium transition-colors ${isCompact ? 'bg-purple-50 border-purple-200 text-purple-700' : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'}`}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 border rounded-full text-xs font-medium transition-colors ${isCompact ? 'bg-purple-50 border-purple-200 text-purple-700' : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'}`}
                     >
-                        <LayoutGrid size={16} /> Diseño
+                        <LayoutGrid size={14} /> Diseño
                     </button>
                 </div>
             </div>
 
             {/* Main Grid Area */}
-            <div className="flex flex-col lg:flex-row gap-8 flex-1 min-h-0">
+            <div className="flex flex-col lg:flex-row gap-5 flex-1 min-h-0 w-full max-w-full overflow-x-hidden">
 
                 {/* Left Sidebar (Mini Calendar & List) */}
-                <div className="w-full lg:w-72 flex flex-col gap-8 shrink-0 border-r border-gray-100 pr-6">
+                <div className="w-full lg:w-64 flex flex-col gap-4 shrink-0 border-r border-gray-100 pr-4">
 
                     {/* Mini Calendar */}
                     <div>

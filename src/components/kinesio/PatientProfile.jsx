@@ -290,14 +290,14 @@ const PatientProfile = () => {
     if (!patient) return <div className="p-8 text-center text-red-500">Cliente no encontrado.</div>;
 
     return (
-        <div className="w-full min-h-full bg-[#F8FAFC] p-4 md:p-8 flex flex-col gap-6 font-sans">
+        <div className="w-full max-w-full overflow-x-hidden min-h-full bg-[#F8FAFC] p-3 md:p-5 flex flex-col gap-4 font-sans">
             {/* Header / Back Button */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
                 <button 
                     onClick={() => navigate(-1)} 
-                    className="p-2.5 bg-white border border-gray-200 rounded-full hover:bg-gray-50 text-gray-600 transition-colors shadow-sm"
+                    className="p-2 bg-white border border-gray-200 rounded-full hover:bg-gray-50 text-gray-600 transition-colors shadow-xs"
                 >
-                    <ArrowLeft size={20} />
+                    <ArrowLeft size={16} />
                 </button>
                 <div>
                     <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-[#111827]">Perfil del Cliente</h1>

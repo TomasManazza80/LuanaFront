@@ -323,18 +323,18 @@ const CargaProductoEcommerce = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] py-6 px-4 sm:px-6 md:px-10 font-sans">
-      <div className="max-w-4xl mx-auto space-y-8">
+    <div className="w-full max-w-full overflow-x-hidden min-h-screen bg-[#F8FAFC] p-3 md:p-5 font-sans">
+      <div className="w-full max-w-4xl mx-auto space-y-5">
 
         {/* ENCABEZADO */}
-        <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xs">
-          <span className="text-[11px] font-bold text-slate-500 uppercase tracking-widest block mb-1">
+        <div className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-xs">
+          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-1">
             CATÁLOGO & E-COMMERCE · LUAN STUDIO
           </span>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 uppercase tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-black text-slate-900 uppercase tracking-tight">
             NUEVO PRODUCTO PASO A PASO
           </h1>
-          <p className="text-xs text-slate-500 font-medium mt-2 leading-relaxed">
+          <p className="text-xs text-slate-500 font-medium mt-1 leading-relaxed">
             Las categorías que cree se guardarán automáticamente en la lista para futuros productos.
           </p>
         </div>

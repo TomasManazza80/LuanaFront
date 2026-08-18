@@ -31,16 +31,14 @@ import UserProfile from "./components/profile/UserProfile.jsx";
 
 function App() {
     return (
-        <div className="min-h-screen w-full">
-            <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
-                <Provider store={store}>
-                    <Router>
-                        <AppContent/>
-                    </Router>
-                    <AuthVerify/>
-                </Provider>
-            </ThemeProvider>
-        </div>
+        <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+            <Provider store={store}>
+                <Router>
+                    <AppContent/>
+                </Router>
+                <AuthVerify/>
+            </Provider>
+        </ThemeProvider>
     )
 }
 

@@ -126,12 +126,12 @@ const AvailabilityManager = () => {
     if (isLoading || isProfileLoading) return <div className="p-8">Cargando...</div>;
 
     return (
-        <div className="w-full h-full bg-[#F8FAFC] p-4 md:p-8 flex flex-col gap-6 font-sans overflow-y-auto">
+        <div className="w-full max-w-full overflow-x-hidden bg-[#F8FAFC] p-3 md:p-5 flex flex-col gap-4 font-sans">
 
             {/* Header */}
             <div>
-                <h1 className="text-3xl font-bold tracking-tight text-[#111827]">Gestión de Disponibilidad</h1>
-                <p className="text-gray-500 mt-1">Configura tus horarios de atención y días no laborables.</p>
+                <h1 className="text-xl md:text-2xl font-bold tracking-tight text-[#111827]">Gestión de Disponibilidad</h1>
+                <p className="text-xs text-gray-500 mt-0.5">Configura tus horarios de atención y días no laborables.</p>
             </div>
 
             <div className="flex flex-col lg:flex-row gap-6">

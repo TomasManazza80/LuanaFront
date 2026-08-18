@@ -336,19 +336,19 @@ const Admin = () => {
       <motion.div
         animate={{ paddingLeft: (sidebarVisible && !isMobile) ? 260 : 0 }}
         transition={springTransition}
-        className={`w-full bg-white ${seccionActiva === 'gestorHome' ? 'h-[calc(100vh-80px)] overflow-hidden' : 'pt-24 md:pt-32 md:p-12 min-h-screen'}`}
+        className={`w-full max-w-full overflow-x-hidden bg-white ${seccionActiva === 'gestorHome' ? 'h-[calc(100vh-80px)] overflow-hidden' : 'p-3 md:p-5 min-h-[calc(100vh-80px)]'}`}
       >
         <AnimatePresence mode="wait">
           <motion.div
             key={seccionActiva}
             variants={sectionVariants}
             initial="initial" animate="animate" exit="exit"
-            className={seccionActiva === 'gestorHome' ? 'w-full h-full' : 'max-w-7xl mx-auto'}
+            className={seccionActiva === 'gestorHome' ? 'w-full h-full' : 'w-full max-w-7xl mx-auto'}
           >
 
 
             {/* SECCIÓN DE RENDERIZADO DE SUBMÓDULOS */}
-            <div className={`w-full relative z-10 ${seccionActiva === 'gestorHome' ? 'h-full' : 'pt-4'}`}>
+            <div className={`w-full max-w-full overflow-x-hidden relative z-10 ${seccionActiva === 'gestorHome' ? 'h-full' : 'pt-2'}`}>
               {seccionActiva === 'Balance' && <BalanceModule />}
               {seccionActiva === 'personalBalance' && <PersonalBalance />}
               {seccionActiva === 'Encargos' && <Encargos />}

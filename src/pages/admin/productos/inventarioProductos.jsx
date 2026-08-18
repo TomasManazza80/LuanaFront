@@ -11,16 +11,16 @@ import ActivityManagerModal from '../../../components/admin/ActivityManagerModal
 
 // --- CONFIGURACIÓN DE ESTILOS (Brutalismo Suave) ---
 const styles = {
-  label: "font-black text-[10px] text-black uppercase tracking-widest mb-2 block",
-  input: "w-full bg-white border border-black rounded-xl p-3 text-black focus:border-black focus:ring-1 focus:ring-black outline-none text-sm font-medium transition-all",
-  searchInput: "w-full bg-white border border-black rounded-full p-3 pl-12 text-black focus:border-black focus:ring-1 focus:ring-black outline-none text-sm font-medium transition-all",
-  title: "text-3xl text-black mb-2 font-black tracking-tighter uppercase flex items-center gap-2",
+  label: "font-black text-[10px] text-black uppercase tracking-widest mb-1.5 block",
+  input: "w-full bg-white border border-black rounded-xl p-2.5 text-black focus:border-black focus:ring-1 focus:ring-black outline-none text-xs font-medium transition-all",
+  searchInput: "w-full bg-white border border-black rounded-full p-2.5 pl-10 text-black focus:border-black focus:ring-1 focus:ring-black outline-none text-xs font-medium transition-all",
+  title: "text-xl md:text-2xl text-black mb-1 font-black tracking-tighter uppercase flex items-center gap-2",
   subtitle: "font-bold tracking-widest uppercase text-gray-500 text-[10px]",
-  btnPrimary: "bg-black text-white font-bold uppercase text-xs rounded-xl hover:bg-gray-800 transition-all py-3 px-4 flex items-center justify-center gap-2",
-  btnSecondary: "bg-white border border-gray-300 text-gray-500 hover:text-black hover:border-black font-bold uppercase text-[10px] rounded-lg transition-all py-3 px-4 flex items-center justify-center gap-2",
-  card: "bg-white border border-gray-200 rounded-2xl p-6 shadow-sm",
-  listItem: "p-3 rounded-xl border transition-all flex items-center justify-between bg-white border-gray-200 hover:border-gray-300",
-  alertNeutral: "p-4 rounded-xl flex items-center gap-3 border bg-gray-100 border-gray-300 text-black text-xs font-bold uppercase",
+  btnPrimary: "bg-black text-white font-bold uppercase text-xs rounded-xl hover:bg-gray-800 transition-all py-2 px-3.5 flex items-center justify-center gap-2",
+  btnSecondary: "bg-white border border-gray-300 text-gray-500 hover:text-black hover:border-black font-bold uppercase text-[10px] rounded-lg transition-all py-2 px-3.5 flex items-center justify-center gap-2",
+  card: "bg-white border border-gray-200 rounded-xl p-4 shadow-xs",
+  listItem: "p-2.5 rounded-xl border transition-all flex items-center justify-between bg-white border-gray-200 hover:border-gray-300",
+  alertNeutral: "p-3 rounded-xl flex items-center gap-2 border bg-gray-100 border-gray-300 text-black text-xs font-bold uppercase",
 };
 
 // --- CREDENCIALES CLOUDINARY ---
@@ -618,7 +618,7 @@ const InventarioProductos = () => {
   );
 
   return (
-    <div className="min-h-screen bg-white text-black p-4 md:p-8 lg:p-12" style={{ fontFamily: '"Inter", sans-serif' }}>
+    <div className="w-full max-w-full overflow-x-hidden min-h-screen bg-white text-black p-3 md:p-5" style={{ fontFamily: '"Inter", sans-serif' }}>
       {/* HEADER CONTROL */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
         <div>

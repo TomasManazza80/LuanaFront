@@ -129,7 +129,7 @@ const Navbar = ({ children }) => {
     }
 
     return (
-        <div className={`flex h-screen bg-[#F8FAFC] font-sans overflow-hidden ${isResizing ? 'select-none cursor-col-resize' : ''}`}>
+        <div className={`flex h-[125vh] bg-[#F8FAFC] font-sans overflow-hidden ${isResizing ? 'select-none cursor-col-resize' : ''}`}>
             
             {/* 1. DESKTOP COLLAPSIBLE & RESIZABLE LEFT SIDEBAR */}
             <aside 

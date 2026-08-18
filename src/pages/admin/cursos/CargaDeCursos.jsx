@@ -213,15 +213,15 @@ const CargaDeCursos = () => {
   };
 
   return (
-    <div className="space-y-8 font-sans pb-16">
+    <div className="w-full max-w-full overflow-x-hidden space-y-5 font-sans p-3 md:p-5">
       
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-200 pb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-gray-200 pb-4">
         <div>
           <span className="text-[10px] font-bold text-gray-400 tracking-widest uppercase mb-1 block">
             MÓDULO ADMINISTRATIVO
           </span>
-          <h1 className="text-2xl md:text-3xl font-black text-black tracking-tight uppercase flex items-center gap-3">
+          <h1 className="text-xl md:text-2xl font-black text-black tracking-tight uppercase flex items-center gap-2">
             <FiBookOpen className="text-black" />
             CARGAR CURSOS Y CAPACITACIONES
           </h1>
@@ -232,15 +232,15 @@ const CargaDeCursos = () => {
         <motion.div 
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-black text-white p-4 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center gap-2 shadow-lg"
+          className="bg-black text-white p-3 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center gap-2 shadow-xs"
         >
-          <FiCheckCircle size={18} className="text-green-400" />
+          <FiCheckCircle size={16} className="text-green-400" />
           {mensajeExito}
         </motion.div>
       )}
 
       {/* Form Grid */}
-      <form onSubmit={handleSubmit} className="bg-white border border-gray-200 rounded-2xl p-6 md:p-8 space-y-6 shadow-sm">
+      <form onSubmit={handleSubmit} className="bg-white border border-gray-200 rounded-xl p-4 md:p-6 space-y-5 shadow-xs">
         <h2 className="text-sm font-black uppercase tracking-widest text-black flex items-center gap-2 border-b border-gray-100 pb-3">
           <FiPlus /> {editId ? 'EDITAR CURSO' : 'INFORMACIÓN DEL CURSO'}
         </h2>

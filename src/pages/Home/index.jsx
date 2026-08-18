@@ -325,114 +325,122 @@ const HOME = () => {
       {/* 2. HERO MONOGRAM & PHONE MOCKUP WITH AUTOMATIC PHOTO SLIDESHOW */}
       <section className="py-8 md:py-14 px-4 sm:px-6 md:px-12 flex flex-col items-center justify-center relative overflow-hidden min-h-[50vh] md:min-h-[55vh]">
 
-        {/* Automatic Background Photo Slider (Right to Left Transition) */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-          <AnimatePresence mode="popLayout">
-            <motion.div
-              key={currentHeroSlide}
-              initial={{ opacity: 0, x: "100%", scale: 1.04 }}
-              animate={{ opacity: 1, x: "0%", scale: 1 }}
-              exit={{ opacity: 0, x: "-100%", scale: 0.96 }}
-              transition={{ duration: 1.4, ease: [0.25, 1, 0.5, 1] }}
-              className="absolute inset-0 bg-cover bg-center"
-              style={{ backgroundImage: `url(${heroBgSlides[currentHeroSlide]})` }}
+        {/* Background Video (if configured) or Automatic Photo Slider */}
+        {homeContent?.hero?.bgVideo ? (
+          <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+            <video
+              key={homeContent.hero.bgVideo}
+              src={homeContent.hero.bgVideo}
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover opacity-70"
             />
-          </AnimatePresence>
-        </div>
+          </div>
+        ) : (
+          <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+            <AnimatePresence mode="popLayout">
+              <motion.div
+                key={currentHeroSlide}
+                initial={{ opacity: 0, x: "100%", scale: 1.04 }}
+                animate={{ opacity: 1, x: "0%", scale: 1 }}
+                exit={{ opacity: 0, x: "-100%", scale: 0.96 }}
+                transition={{ duration: 1.4, ease: [0.25, 1, 0.5, 1] }}
+                className="absolute inset-0 bg-cover bg-center"
+                style={{ backgroundImage: `url(${heroBgSlides[currentHeroSlide]})` }}
+              />
+            </AnimatePresence>
+          </div>
+        )}
 
         {/* Dark Luxury Vignette & Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-[#2E1318]/90 via-[#3D1A20]/80 to-[#2E1318]/90 backdrop-blur-[2px] pointer-events-none z-0" />
 
-        <div className="max-w-6xl mx-auto w-full flex flex-col md:flex-row items-center justify-center gap-8 md:gap-14 lg:gap-20 relative z-10">
+        <div className="max-w-6xl mx-auto w-full flex flex-row items-center justify-center gap-3 sm:gap-8 md:gap-14 lg:gap-20 relative z-10 px-2 sm:px-4">
 
           {/* CENTERED LOGO MONOGRAM */}
           <motion.div
             initial={{ opacity: 0, scale: 0.85, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 1, delay: 1.5, ease: [0.22, 1, 0.36, 1] }}
-            className="flex flex-col items-center text-center z-10 shrink-0"
+            transition={{ duration: 1, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            className="flex flex-col items-center text-center z-10 shrink max-w-[58%] sm:max-w-none"
           >
             {homeContent?.hero?.badge && (
-              <div className="mb-4 bg-[#F3ECE7] text-[#3D1A20] font-bold px-4 py-1.5 rounded-full text-xs uppercase tracking-widest shadow-md">
+              <div className="mb-2 sm:mb-4 bg-[#F3ECE7] text-[#3D1A20] font-bold px-2.5 sm:px-4 py-1 sm:py-1.5 rounded-full text-[8px] sm:text-xs uppercase tracking-widest shadow-md truncate max-w-full">
                 {homeContent.hero.badge}
               </div>
             )}
 
             {/* Logo Luan image with heart */}
-            <div className="relative mb-4 select-none group">
-              <div className="absolute -top-2.5 -right-1.5 text-[#F3ECE7] animate-bounce z-10">
-                <svg className="w-6 h-6 md:w-8 md:h-8 fill-current drop-shadow-md" viewBox="0 0 24 24">
+            <div className="relative mb-2 sm:mb-4 select-none group">
+              <div className="absolute -top-2 -right-1 sm:-top-2.5 sm:-right-1.5 text-[#F3ECE7] animate-bounce z-10">
+                <svg className="w-4 h-4 sm:w-7 sm:h-7 md:w-8 md:h-8 fill-current drop-shadow-md" viewBox="0 0 24 24">
                   <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                 </svg>
               </div>
               <img
                 src="/images/logoLuan.jpeg"
                 alt="Luan Studio"
-                className="w-32 h-32 sm:w-40 sm:h-40 md:w-44 md:h-44 rounded-full object-cover shadow-[0_20px_50px_rgba(0,0,0,0.5)] border-4 border-[#F3ECE7] transition-transform duration-500 group-hover:scale-105"
+                className="w-20 h-20 sm:w-36 sm:h-36 md:w-44 md:h-44 rounded-full object-cover shadow-[0_20px_50px_rgba(0,0,0,0.5)] border-2 sm:border-4 border-[#F3ECE7] transition-transform duration-500 group-hover:scale-105"
               />
             </div>
 
-            <p className="text-sm md:text-lg tracking-[0.35em] uppercase font-light text-[#F3ECE7] font-semibold drop-shadow">
+            <p className="text-xs sm:text-base md:text-lg tracking-[0.2em] sm:tracking-[0.35em] uppercase font-light text-[#F3ECE7] font-semibold drop-shadow">
               {homeContent?.hero?.monogramText || '· Luan studio ·'}
             </p>
-            <span className="mt-2 text-[9px] md:text-xs tracking-[0.25em] text-[#F3ECE7] uppercase font-medium bg-[#F3ECE7]/20 backdrop-blur-md px-4 py-1.5 rounded-full border border-[#F3ECE7]/30 shadow-md">
+            <span className="mt-1 sm:mt-2 text-[8px] sm:text-xs tracking-[0.15em] sm:tracking-[0.25em] text-[#F3ECE7] uppercase font-medium bg-[#F3ECE7]/20 backdrop-blur-md px-2.5 sm:px-4 py-1 sm:py-1.5 rounded-full border border-[#F3ECE7]/30 shadow-md">
               {homeContent?.hero?.monogramSub || 'Nail & Beauty Experience'}
             </span>
 
-            <div className="mt-6 flex flex-wrap justify-center gap-3">
+            <div className="mt-3 sm:mt-6 flex flex-wrap justify-center gap-1.5 sm:gap-3">
               <button
                 onClick={() => navigate('/reservar')}
-                className="bg-[#F3ECE7] text-[#3D1A20] hover:bg-white font-bold px-6 py-2.5 rounded-full text-xs uppercase tracking-wider shadow-lg transition-transform hover:scale-105"
+                className="bg-[#F3ECE7] text-[#3D1A20] hover:bg-white font-bold px-3 sm:px-6 py-1.5 sm:py-2.5 rounded-full text-[8px] sm:text-xs uppercase tracking-wider shadow-lg transition-transform hover:scale-105"
               >
                 {homeContent?.hero?.btn1Text || "RESERVAR MI TURNO"}
               </button>
               <button
                 onClick={() => navigate('/productos')}
-                className="border border-[#F3ECE7] text-[#F3ECE7] hover:bg-[#F3ECE7]/10 font-bold px-6 py-2.5 rounded-full text-xs uppercase tracking-wider transition-all"
+                className="border border-[#F3ECE7] text-[#F3ECE7] hover:bg-[#F3ECE7]/10 font-bold px-3 sm:px-6 py-1.5 sm:py-2.5 rounded-full text-[8px] sm:text-xs uppercase tracking-wider transition-all"
               >
                 {homeContent?.hero?.btn2Text || "EXPLORAR PRODUCTOS & TIENDA"}
               </button>
             </div>
           </motion.div>
 
-          {/* SMARTPHONE MOCKUP (POSITIONED NEXT TO LOGO, ENTRANCE FROM RIGHT) */}
+          {/* SMARTPHONE MOCKUP (HORIZONTALLY POSITIONED NEXT TO LOGO ALWAYS) */}
           <motion.div
-            initial={{ opacity: 0, x: 280, rotate: 12, scale: 0.85 }}
+            initial={{ opacity: 0, x: 100, rotate: 6, scale: 0.85 }}
             animate={{ opacity: 1, x: 0, rotate: 0, scale: 1 }}
-            transition={{ duration: 1.2, delay: 1.8, ease: [0.25, 1, 0.5, 1] }}
-            className="relative flex justify-center items-center z-10"
+            transition={{ duration: 1.2, delay: 0.8, ease: [0.25, 1, 0.5, 1] }}
+            className="relative flex justify-center items-center z-10 shrink-0"
           >
             {/* Soft background ambient glow */}
-            <div className="absolute inset-0 bg-white/10 blur-3xl rounded-full scale-110 pointer-events-none" />
+            <div className="absolute inset-0 bg-white/10 blur-2xl sm:blur-3xl rounded-full scale-110 pointer-events-none" />
 
             {/* Floating animation wrapper */}
             <motion.div
-              animate={{ y: [0, -10, 0] }}
+              animate={{ y: [0, -8, 0] }}
               transition={{ repeat: Infinity, duration: 4.5, ease: "easeInOut" }}
-              className="relative w-[170px] sm:w-[200px] md:w-[220px] lg:w-[235px]"
+              className="relative w-[115px] xs:w-[145px] sm:w-[190px] md:w-[220px] lg:w-[235px]"
             >
-              {/* Phone Outer Shell */}
-              <div className="relative bg-[#1a1315] p-2.5 sm:p-3 rounded-[38px] sm:rounded-[42px] shadow-[0_25px_60px_-10px_rgba(0,0,0,0.6)] border-[4px] border-[#3D1A20] ring-1 ring-white/30 overflow-hidden select-none">
+              {/* Phone Outer Shell - Ultra thin border & sleek padding */}
+              <div className="relative bg-[#1a1315] p-1 sm:p-1.5 rounded-[22px] sm:rounded-[36px] shadow-[0_20px_50px_-10px_rgba(0,0,0,0.7)] border border-[#3D1A20]/70 ring-1 ring-white/20 overflow-hidden select-none">
 
                 {/* Dynamic Island Notch */}
-                <div className="w-20 h-3.5 bg-black rounded-full mx-auto absolute top-4 left-1/2 -translate-x-1/2 z-30 flex items-center justify-between px-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-[#111]" />
-                  <div className="w-2 h-2 rounded-full bg-[#0d0d18] border border-blue-900/40" />
+                <div className="w-10 sm:w-16 h-1.5 sm:h-2.5 bg-black rounded-full mx-auto absolute top-1.5 sm:top-2.5 left-1/2 -translate-x-1/2 z-30 flex items-center justify-between px-1 sm:px-1.5">
+                  <div className="w-1 sm:w-1.5 h-1 sm:h-1.5 rounded-full bg-[#111]" />
+                  <div className="w-1 sm:w-1.5 h-1 sm:h-1.5 rounded-full bg-[#0d0d18] border border-blue-900/40" />
                 </div>
 
-                {/* Left Side Buttons */}
-                <div className="absolute top-24 -left-[7px] w-[3px] h-7 bg-[#3D1A20] rounded-l-md" />
-                <div className="absolute top-36 -left-[7px] w-[3px] h-10 bg-[#3D1A20] rounded-l-md" />
-                <div className="absolute top-48 -left-[7px] w-[3px] h-10 bg-[#3D1A20] rounded-l-md" />
-                {/* Right Side Button */}
-                <div className="absolute top-32 -right-[7px] w-[3px] h-14 bg-[#3D1A20] rounded-r-md" />
-
                 {/* Phone Screen Container */}
-                <div className="relative overflow-hidden rounded-[34px] sm:rounded-[38px] aspect-[9/19.5] bg-black border border-black shadow-inner">
+                <div className="relative overflow-hidden rounded-[18px] sm:rounded-[30px] aspect-[9/19.5] bg-black border border-black/40 shadow-inner">
 
                   {/* Video Player */}
                   <video
-                    src={videoHero}
+                    key={homeContent?.hero?.phoneVideo || 'default'}
+                    src={homeContent?.hero?.phoneVideo || videoHero}
                     autoPlay
                     loop
                     muted
@@ -441,23 +449,12 @@ const HOME = () => {
                   />
 
                   {/* Glass Reflection Effect */}
-                  <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/15 to-transparent pointer-events-none z-20" />
-
-                  {/* Phone Header Time & Status */}
-                  <div className="absolute top-2 left-0 right-0 px-6 flex justify-between items-center text-[10px] text-white/90 font-semibold z-20 pointer-events-none">
-                    <span>9:41</span>
-                    <div className="flex items-center gap-1.5">
-                      <svg className="w-3 h-3 fill-current" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.2 19.43 10.55 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9z" /></svg>
-                      <div className="w-4 h-2 border border-white/80 rounded-sm p-0.5 flex items-center">
-                        <div className="w-full h-full bg-white rounded-xs" />
-                      </div>
-                    </div>
-                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent pointer-events-none z-20" />
 
                   {/* Tag Overlay */}
-                  <div className="absolute bottom-4 left-3 right-3 z-20 pointer-events-none">
-                    <div className="bg-[#3D1A20]/80 backdrop-blur-md border border-white/20 text-[#F3ECE7] px-3 py-2 rounded-xl text-center shadow-lg">
-                      <p className="text-[10px] font-bold tracking-wider uppercase">
+                  <div className="absolute bottom-2 sm:bottom-3 left-1 sm:left-2 right-1 sm:right-2 z-20 pointer-events-none">
+                    <div className="bg-[#3D1A20]/85 backdrop-blur-md border border-white/20 text-[#F3ECE7] px-1.5 sm:px-2.5 py-1 sm:py-1.5 rounded-md sm:rounded-lg text-center shadow-lg">
+                      <p className="text-[7px] sm:text-[9px] font-bold tracking-wider uppercase truncate">
                         {homeContent?.hero?.phoneBadge || 'RESERVAR TURNO ONLINE'}
                       </p>
                     </div>
@@ -465,7 +462,7 @@ const HOME = () => {
                 </div>
 
                 {/* Bottom Home Bar */}
-                <div className="w-28 h-1 bg-white/40 rounded-full mx-auto mt-2 mb-0.5" />
+                <div className="w-12 sm:w-20 h-0.5 sm:h-1 bg-white/40 rounded-full mx-auto mt-1 sm:mt-1.5 mb-0.5" />
               </div>
             </motion.div>
           </motion.div>

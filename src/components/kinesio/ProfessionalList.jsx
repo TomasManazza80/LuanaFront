@@ -295,18 +295,18 @@ const ProfessionalList = () => {
     };
 
     return (
-        <div className="w-full h-full bg-[#F8FAFC] p-4 md:p-8 flex flex-col gap-6 overflow-y-auto">
+        <div className="w-full max-w-full overflow-x-hidden bg-[#F8FAFC] p-3 md:p-5 flex flex-col gap-4">
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-[#111827]">Equipo / Profesionales</h1>
-                    <p className="text-gray-500 mt-1">Gestiona los profesionales y usuarios administradores del sistema.</p>
+                    <h1 className="text-xl md:text-2xl font-bold tracking-tight text-[#111827]">Equipo / Profesionales</h1>
+                    <p className="text-xs text-gray-500 mt-0.5">Gestiona los profesionales y usuarios administradores del sistema.</p>
                 </div>
                 <button 
                     onClick={() => setIsModalOpen(true)}
-                    className="bg-[#0A58CA] hover:bg-blue-700 text-white font-bold py-2.5 px-5 rounded-xl transition-colors shadow-sm flex items-center justify-center gap-2"
+                    className="bg-[#0A58CA] hover:bg-blue-700 text-white font-bold py-1.5 px-3.5 rounded-xl transition-colors shadow-xs flex items-center justify-center gap-1.5 text-xs"
                 >
-                    <Plus size={20} />
+                    <Plus size={16} />
                     Añadir Profesional
                 </button>
             </div>

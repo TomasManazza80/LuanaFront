@@ -434,16 +434,16 @@ const MedicalHistoryEntry = () => {
   if (id && !patient) return <div className="p-8 text-red-500">Cliente no encontrado.</div>;
   
   return (
-    <div className="w-full h-full bg-[#F8FAFC] p-4 md:p-8 flex flex-col gap-6 font-sans overflow-y-auto">
+    <div className="w-full max-w-full overflow-x-hidden bg-[#F8FAFC] p-3 md:p-5 flex flex-col gap-4 font-sans">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <button onClick={() => navigate(-1)} className="p-2 bg-white border border-gray-200 rounded-full hover:bg-gray-50 text-gray-600 transition-colors">
-              <ArrowLeft size={20} />
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div className="flex items-center gap-3">
+          <button onClick={() => navigate(-1)} className="p-1.5 bg-white border border-gray-200 rounded-full hover:bg-gray-50 text-gray-600 transition-colors">
+              <ArrowLeft size={16} />
           </button>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-[#111827]">Historia Clínica</h1>
-            <p className="text-gray-500 mt-1">Gestión de historiales, evoluciones y plantillas.</p>
+            <h1 className="text-xl md:text-2xl font-bold tracking-tight text-[#111827]">Historia Clínica</h1>
+            <p className="text-xs text-gray-500 mt-0.5">Gestión de historiales, evoluciones y plantillas.</p>
           </div>
         </div>
 

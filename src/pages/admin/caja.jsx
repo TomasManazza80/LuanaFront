@@ -1285,17 +1285,17 @@ const ModuloVentas = () => {
     }, [historialVentas, busquedaHistorial]);
 
     return (
-        <div className="layout-main-wrapper min-h-screen bg-background text-foreground fedecell-body">
-            <nav className="flex flex-row gap-6 md:gap-10 mb-8 border-b border-border overflow-x-auto no-scrollbar pb-1 w-full md:justify-center">
+        <div className="w-full max-w-full overflow-x-hidden p-3 md:p-5 bg-background text-foreground fedecell-body min-h-screen">
+            <nav className="flex flex-row gap-4 md:gap-8 mb-4 border-b border-border overflow-x-auto no-scrollbar pb-1 w-full md:justify-center">
                 {['productos', 'servicios', 'historial'].map(v => (
-                    <button key={v} onClick={() => setVistaActual(v)} className={`pb-4 font-medium uppercase tracking-widest text-xs md:text-sm transition-all duration-300 whitespace-nowrap ${vistaActual === v ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground hover:text-foreground'}`}>
+                    <button key={v} onClick={() => setVistaActual(v)} className={`pb-2 font-medium uppercase tracking-widest text-xs transition-all duration-300 whitespace-nowrap ${vistaActual === v ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground hover:text-foreground'}`}>
                         {v === 'historial' ? 'HISTORIAL DE VENTAS RECIENTES' : v.toUpperCase()}
                     </button>
                 ))}
             </nav>
 
-            <div className={`flex flex-col lg:flex-row gap-8 w-full mt-8`}>
-                <div className={`w-full ${vistaActual === 'historial' ? 'w-full' : 'lg:w-8/12'} h-[calc(100vh-60px)] overflow-y-auto custom-scrollbar pr-2`}>
+            <div className={`flex flex-col lg:flex-row gap-5 w-full mt-4 max-w-full overflow-x-hidden`}>
+                <div className={`w-full ${vistaActual === 'historial' ? 'w-full' : 'lg:w-8/12'} min-h-[calc(100vh-100px)] overflow-y-auto custom-scrollbar pr-2`}>
                     {vistaActual === 'productos' && (
                         <div className="sticky top-0 z-20 bg-background pt-2 pb-6 mb-4 group">
                             <FiSearch className="absolute left-4 top-6 text-muted-foreground group-focus-within:text-primary transition-colors" />

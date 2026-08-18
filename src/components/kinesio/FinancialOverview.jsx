@@ -111,26 +111,26 @@ const FinancialOverview = () => {
 
   return (
     <>
-    <div className="w-full h-full bg-[#F8FAFC] p-4 md:p-8 flex flex-col gap-6 font-sans overflow-y-auto">
+    <div className="w-full max-w-full overflow-x-hidden bg-[#F8FAFC] p-3 md:p-5 flex flex-col gap-4 font-sans">
       
       {/* Header Navigation & Actions */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-[#111827]">Resumen Financiero</h1>
-          <p className="text-gray-500 mt-1">Controla los ingresos, gastos y egresos por período.</p>
+          <h1 className="text-xl md:text-2xl font-bold tracking-tight text-[#111827]">Resumen Financiero</h1>
+          <p className="text-xs text-gray-500 mt-0.5">Controla los ingresos, gastos y egresos por período.</p>
         </div>
         
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-2">
             {/* Toggle Filters for Overview */}
             {activeTab === 'overview' && (
-              <div className="flex bg-gray-100 p-1 rounded-lg">
+              <div className="flex bg-gray-100 p-0.5 rounded-lg">
                 {['Dia', 'Semana', 'Mes'].map((t) => (
                     <button
                     key={t}
                     onClick={() => setTimeFilter(t)}
-                    className={`px-4 py-1.5 rounded-md text-sm font-semibold transition-all ${
+                    className={`px-3 py-1 rounded-md text-xs font-semibold transition-all ${
                         timeFilter === t
-                        ? 'bg-[#0A58CA] text-white shadow-sm'
+                        ? 'bg-[#0A58CA] text-white shadow-xs'
                         : 'text-gray-600 hover:text-gray-900'
                     }`}
                     >
@@ -143,42 +143,42 @@ const FinancialOverview = () => {
             {/* Historial de Cierres de Caja */}
             <button 
                onClick={() => { setShowHistoryModal(true); setHistoryLimit(50); setSelectedDayGroup(null); }}
-               className="bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 px-4 py-2.5 rounded-lg font-semibold shadow-sm transition-all flex items-center gap-2 text-sm whitespace-nowrap"
+               className="bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 px-3 py-1.5 rounded-lg font-semibold shadow-xs transition-all flex items-center gap-1.5 text-xs whitespace-nowrap"
             >
-               <History size={18} /> Historial de Cierres de Caja
+               <History size={15} /> Historial de Cierres de Caja
             </button>
 
             {/* Botón para cargar nuevo movimiento */}
             <button 
                onClick={() => setShowModal(true)}
-               className="bg-[#0A58CA] hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-semibold shadow-sm transition-all flex items-center gap-2 text-sm whitespace-nowrap"
+               className="bg-[#0A58CA] hover:bg-blue-700 text-white px-3.5 py-1.5 rounded-lg font-semibold shadow-xs transition-all flex items-center gap-1.5 text-xs whitespace-nowrap"
             >
-               <Plus size={18} /> Nueva Transacción
+               <Plus size={15} /> Nueva Transacción
             </button>
         </div>
       </div>
 
       {/* Tabs Bar */}
-      <div className="flex border-b border-gray-200 gap-6">
+      <div className="flex border-b border-gray-200 gap-4">
         <button
           onClick={() => setActiveTab('overview')}
-          className={`pb-3 text-sm font-bold flex items-center gap-2 border-b-2 transition-all ${
+          className={`pb-2 text-xs font-bold flex items-center gap-1.5 border-b-2 transition-all ${
             activeTab === 'overview'
               ? 'border-[#0A58CA] text-[#0A58CA]'
               : 'border-transparent text-gray-500 hover:text-gray-800'
           }`}
         >
-          <Landmark size={18} /> Resumen General
+          <Landmark size={15} /> Resumen General
         </button>
         <button
           onClick={() => setActiveTab('expenses')}
-          className={`pb-3 text-sm font-bold flex items-center gap-2 border-b-2 transition-all ${
+          className={`pb-2 text-xs font-bold flex items-center gap-1.5 border-b-2 transition-all ${
             activeTab === 'expenses'
               ? 'border-red-600 text-red-600'
               : 'border-transparent text-gray-500 hover:text-gray-800'
           }`}
         >
-          <TrendingDown size={18} /> Consulta de Egresos por Rango
+          <TrendingDown size={15} /> Consulta de Egresos por Rango
         </button>
       </div>
 
@@ -186,32 +186,32 @@ const FinancialOverview = () => {
       {activeTab === 'overview' && (
         <>
           {/* KPI Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             
             {/* Total Balance */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-center">
-              <div className="flex justify-between items-center mb-2">
-                <div className="flex items-center gap-2 text-gray-500 font-semibold text-sm">
-                  <Landmark size={18} /> Balance Total
+            <div className="bg-white rounded-xl p-4 shadow-xs border border-gray-100 flex flex-col justify-center">
+              <div className="flex justify-between items-center mb-1">
+                <div className="flex items-center gap-1.5 text-gray-500 font-semibold text-xs">
+                  <Landmark size={15} /> Balance Total
                 </div>
               </div>
-              <div className="text-3xl font-bold text-gray-900">{formatCurrency(totalBalance)}</div>
+              <div className="text-xl md:text-2xl font-bold text-gray-900">{formatCurrency(totalBalance)}</div>
             </div>
 
             {/* Income */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-center">
-              <div className="flex items-center gap-2 text-gray-500 font-semibold text-sm mb-2">
-                <TrendingUp size={18} className="text-[#3B82F6]" /> Ingresos
+            <div className="bg-white rounded-xl p-4 shadow-xs border border-gray-100 flex flex-col justify-center">
+              <div className="flex items-center gap-1.5 text-gray-500 font-semibold text-xs mb-1">
+                <TrendingUp size={15} className="text-[#3B82F6]" /> Ingresos
               </div>
-              <div className="text-3xl font-bold text-[#3B82F6]">{formatCurrency(totalIncome)}</div>
+              <div className="text-xl md:text-2xl font-bold text-[#3B82F6]">{formatCurrency(totalIncome)}</div>
             </div>
 
             {/* Expenses */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-center">
-              <div className="flex items-center gap-2 text-gray-500 font-semibold text-sm mb-2">
-                <TrendingDown size={18} className="text-[#EF4444]" /> Gastos
+            <div className="bg-white rounded-xl p-4 shadow-xs border border-gray-100 flex flex-col justify-center">
+              <div className="flex items-center gap-1.5 text-gray-500 font-semibold text-xs mb-1">
+                <TrendingDown size={15} className="text-[#EF4444]" /> Gastos
               </div>
-              <div className="text-3xl font-bold text-[#EF4444]">{formatCurrency(totalExpense)}</div>
+              <div className="text-xl md:text-2xl font-bold text-[#EF4444]">{formatCurrency(totalExpense)}</div>
             </div>
 
           </div>

@@ -297,13 +297,13 @@ const Gastos = () => {
     };
 
     return (
-        <div className="bg-white min-h-screen p-8 md:p-12 text-black font-['Inter'] selection:bg-white selection:text-black animate-in fade-in duration-700">
+        <div className="w-full max-w-full overflow-x-hidden bg-white min-h-screen p-3 md:p-5 text-black font-['Inter']">
 
             {/* HEADER */}
-            <header className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-8 border-b border-black pb-10">
+            <header className="flex flex-col md:flex-row justify-between items-start md:items-end mb-4 gap-3 border-b border-black pb-4">
                 <div>
-                    <h1 className={`${STYLES.title} text-5xl leading-none`}>GESTIÓN DE <span className="text-black">GASTOS</span></h1>
-                    <p className={`${STYLES.tech} text-[10px] text-gray-500 mt-6 tracking-[0.5em]`}>COST_CONTROL_CENTER // FEDECELL_ADMIN</p>
+                    <h1 className={`${STYLES.title} text-xl md:text-2xl leading-none`}>GESTIÓN DE <span className="text-black">GASTOS</span></h1>
+                    <p className={`${STYLES.tech} text-[10px] text-gray-500 mt-1 tracking-widest`}>COST_CONTROL_CENTER // FEDECELL_ADMIN</p>
                 </div>
             </header>
 

@@ -504,15 +504,15 @@ const ModuloClientes = () => {
     }, [activeTab]);
 
     return (
-        <div className="bg-white min-h-screen p-4 md:p-8 lg:p-12 text-black" style={{ fontFamily: '"Inter", sans-serif' }}>
+        <div className="w-full max-w-full overflow-x-hidden bg-white min-h-screen p-3 md:p-5 text-black" style={{ fontFamily: '"Inter", sans-serif' }}>
 
             {/* Header Fedecell */}
-            <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-10 pb-8 border-b border-gray-200 gap-6">
+            <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-4 pb-4 border-b border-gray-200 gap-3">
                 <div>
-                    <h1 className={`${STYLES.title} text-4xl md:text-5xl leading-none`}>MÓDULO DE <span className="text-gray-400">CLIENTES</span></h1>
-                    <p className={`${STYLES.tech} text-[10px] text-gray-500 mt-4 tracking-widest`}>GESTIÓN DE CLIENTES // BASE DE DATOS</p>
+                    <h1 className={`${STYLES.title} text-xl md:text-2xl leading-none`}>MÓDULO DE <span className="text-gray-400">CLIENTES</span></h1>
+                    <p className={`${STYLES.tech} text-[10px] text-gray-500 mt-1 tracking-widest`}>GESTIÓN DE CLIENTES // BASE DE DATOS</p>
                 </div>
-                <div className="bg-gray-50 px-6 py-3 border border-gray-200 rounded-xl text-[10px] text-black uppercase font-black shadow-sm">
+                <div className="bg-gray-50 px-4 py-2 border border-gray-200 rounded-xl text-[10px] text-black uppercase font-black shadow-xs">
                     BASE DE DATOS ACTIVA
                 </div>
             </div>

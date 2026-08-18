@@ -268,14 +268,14 @@ const HistorialVentasOnline = () => {
     }), [pedidos]);
 
     return (
-        <div className="min-h-screen bg-white text-black p-4 md:p-8 lg:p-12 space-y-10" style={{ fontFamily: '"Inter", sans-serif' }}>
+        <div className="w-full max-w-full overflow-x-hidden min-h-screen bg-white text-black p-3 md:p-5 space-y-5" style={{ fontFamily: '"Inter", sans-serif' }}>
             {/* HEADER */}
-            <header className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-10 pb-8 border-b border-gray-200">
+            <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-4 pb-4 border-b border-gray-200">
                 <div>
-                    <h1 className={`${styles.heading} text-3xl md:text-5xl`}>
+                    <h1 className={`${styles.heading} text-xl md:text-2xl`}>
                         VENTAS ONLINE
                     </h1>
-                    <p className={`${styles.tech} text-[10px] font-bold text-gray-500 mt-3 tracking-widest uppercase`}>
+                    <p className={`${styles.tech} text-[10px] font-bold text-gray-500 mt-1 tracking-widest uppercase`}>
                         CENTRO DE DESPACHO ECOMMERCE
                     </p>
                 </div>

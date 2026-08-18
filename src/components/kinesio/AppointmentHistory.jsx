@@ -114,10 +114,10 @@ const AppointmentHistory = () => {
     }
 
     return (
-        <div className="flex-1 bg-[#F8FAFC] p-4 md:p-8 flex flex-col font-sans overflow-hidden h-full">
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold tracking-tight text-[#111827]">Historial de Turnos</h1>
-                <p className="text-gray-500 mt-1">
+        <div className="w-full max-w-full overflow-x-hidden flex-1 bg-[#F8FAFC] p-3 md:p-5 flex flex-col font-sans h-full">
+            <div className="mb-4">
+                <h1 className="text-xl md:text-2xl font-bold tracking-tight text-[#111827]">Historial de Turnos</h1>
+                <p className="text-xs text-gray-500 mt-0.5">
                     Consulta el registro completo de todos los turnos agendados en el sistema.
                 </p>
             </div>

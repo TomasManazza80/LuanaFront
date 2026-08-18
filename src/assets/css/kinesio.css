@@ -1,0 +1,195 @@
+/* Kinesiology Admin Panel - Premium UI */
+:root {
+  --primary-color: #4a90e2;
+  --secondary-color: #50e3c2;
+  --bg-color: #0f172a;
+  --surface-color: rgba(30, 41, 59, 0.7);
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --border-color: rgba(255, 255, 255, 0.1);
+  --glass-blur: blur(12px);
+  --accent-gradient: linear-gradient(135deg, #4a90e2, #50e3c2);
+  --danger-color: #ef4444;
+  --success-color: #10b981;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  background-image: 
+    radial-gradient(circle at 15% 50%, rgba(74, 144, 226, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 85% 30%, rgba(80, 227, 194, 0.15) 0%, transparent 50%);
+  background-attachment: fixed;
+}
+
+/* Glassmorphism containers */
+.kinesio-glass-panel {
+  background: var(--surface-color);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.kinesio-glass-panel:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4);
+}
+
+/* Typography */
+.kinesio-title {
+  font-size: 2rem;
+  font-weight: 700;
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 24px;
+}
+
+.kinesio-subtitle {
+  font-size: 1.25rem;
+  color: var(--text-primary);
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+/* Dashboard Layout */
+.kinesio-dashboard {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  min-height: 100vh;
+}
+
+.kinesio-sidebar {
+  background: rgba(15, 23, 42, 0.9);
+  border-right: 1px solid var(--border-color);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.kinesio-nav-item {
+  padding: 12px 16px;
+  border-radius: 8px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.kinesio-nav-item:hover, .kinesio-nav-item.active {
+  background: rgba(255,255,255,0.05);
+  color: var(--text-primary);
+  border-left: 3px solid var(--primary-color);
+}
+
+.kinesio-main-content {
+  padding: 32px;
+  overflow-y: auto;
+}
+
+/* Buttons */
+.kinesio-btn {
+  background: var(--accent-gradient);
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.2s;
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+}
+
+.kinesio-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+/* Timeline specific styles */
+.kinesio-timeline {
+  position: relative;
+  padding-left: 24px;
+}
+
+.kinesio-timeline::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--border-color);
+}
+
+.kinesio-timeline-item {
+  position: relative;
+  margin-bottom: 24px;
+  padding-left: 24px;
+}
+
+.kinesio-timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -29px; /* 24px + 5px radius */
+  top: 6px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  box-shadow: 0 0 0 4px var(--bg-color);
+}
+
+.kinesio-timeline-date {
+  font-size: 0.85rem;
+  color: var(--secondary-color);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+/* Calendar specifics */
+.kinesio-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+.kinesio-calendar-day {
+  background: rgba(255,255,255,0.02);
+  border-radius: 8px;
+  padding: 12px;
+  min-height: 100px;
+  border: 1px solid var(--border-color);
+}
+
+.kinesio-calendar-header {
+  text-align: center;
+  font-weight: 600;
+  color: var(--text-secondary);
+  padding-bottom: 8px;
+}
+
+.kinesio-appointment-chip {
+  background: rgba(80, 227, 194, 0.2);
+  border-left: 3px solid var(--secondary-color);
+  color: var(--text-primary);
+  font-size: 0.8rem;
+  padding: 6px;
+  border-radius: 4px;
+  margin-top: 4px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.kinesio-appointment-chip:hover {
+  transform: scale(1.02);
+}

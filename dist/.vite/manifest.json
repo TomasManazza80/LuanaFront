@@ -1,0 +1,63 @@
+{
+  "index.html": {
+    "file": "assets/index-f3TPG8gq.js",
+    "name": "index",
+    "src": "index.html",
+    "isEntry": true,
+    "dynamicImports": [
+      "node_modules/html2canvas/dist/html2canvas.esm.js",
+      "node_modules/dompurify/dist/purify.es.mjs",
+      "node_modules/canvg/lib/index.es.js"
+    ],
+    "css": [
+      "assets/index-DLBvm0jw.css"
+    ],
+    "assets": [
+      "assets/video1-BPaXCTNN.mp4",
+      "assets/foto1-BBlMvW34.jpg",
+      "assets/outfit-latin-ext-wght-normal-5oMg_0D4.woff2",
+      "assets/outfit-latin-wght-normal-CdKZfrg9.woff2"
+    ]
+  },
+  "node_modules/@fontsource-variable/outfit/files/outfit-latin-ext-wght-normal.woff2": {
+    "file": "assets/outfit-latin-ext-wght-normal-5oMg_0D4.woff2",
+    "src": "node_modules/@fontsource-variable/outfit/files/outfit-latin-ext-wght-normal.woff2"
+  },
+  "node_modules/@fontsource-variable/outfit/files/outfit-latin-wght-normal.woff2": {
+    "file": "assets/outfit-latin-wght-normal-CdKZfrg9.woff2",
+    "src": "node_modules/@fontsource-variable/outfit/files/outfit-latin-wght-normal.woff2"
+  },
+  "node_modules/canvg/lib/index.es.js": {
+    "file": "assets/index.es-BAsWiMVX.js",
+    "name": "index.es",
+    "src": "node_modules/canvg/lib/index.es.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "index.html"
+    ]
+  },
+  "node_modules/dompurify/dist/purify.es.mjs": {
+    "file": "assets/purify.es-DP5U8-sc.js",
+    "name": "purify.es",
+    "src": "node_modules/dompurify/dist/purify.es.mjs",
+    "isDynamicEntry": true
+  },
+  "node_modules/html2canvas/dist/html2canvas.esm.js": {
+    "file": "assets/html2canvas.esm-BfxBtG_O.js",
+    "name": "html2canvas.esm",
+    "src": "node_modules/html2canvas/dist/html2canvas.esm.js",
+    "isDynamicEntry": true
+  },
+  "src/media/foto1.jpg": {
+    "file": "assets/foto1-BBlMvW34.jpg",
+    "src": "src/media/foto1.jpg"
+  },
+  "src/media/video1.mp4": {
+    "file": "assets/video1-BPaXCTNN.mp4",
+    "src": "src/media/video1.mp4"
+  },
+  "src/pages/images/LOGOCRUCE.png": {
+    "file": "assets/LOGOCRUCE-BBRp7LPP.png",
+    "src": "src/pages/images/LOGOCRUCE.png"
+  }
+}

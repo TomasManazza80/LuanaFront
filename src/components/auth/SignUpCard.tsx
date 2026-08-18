@@ -59,7 +59,14 @@ export const SignUpCard = () => {
     })
 
     function onSubmit(data) {
-        register({...data, role: 'USER'}).then((res: any) => {
+        const payload = {
+            email: data.email,
+            password: data.password,
+            name: `${data.first_name} ${data.last_name}`,
+            number: "0000000000",
+            role: 'user'
+        };
+        register(payload).then((res: any) => {
             if (res.data) {
                 login({email: form.getValues('email'), password: form.getValues('password')}).then((res: any) => {
                     if (res.data) {

@@ -25,7 +25,7 @@ const customFetchBase = async (args, api, extraOptions) => {
     await mutex.waitForUnlock();
     let result = await baseQuery(args, api, extraOptions);
 
-    if (result.error && (result.error.status === 401 || result.error.status === 403) && args.url !== '/login' && args.url !== '/signup') {
+    if (result.error && (result.error.status === 401 || result.error.status === 403) && args.url !== '/login' && args.url !== '/createuser') {
         if(!mutex.isLocked()){
             const release = await mutex.acquire();
             try {

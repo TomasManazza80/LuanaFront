@@ -46,10 +46,31 @@ export const authApi = createApi({
         }),
         register: build.mutation({
             query: (credentials) => ({
-                url: '/signup',
+                url: '/createuser',
                 method: 'POST',
                 body: credentials,
             }),
+            async onQueryStarted(arg, { queryFulfilled }) {
+                queryFulfilled
+                    .then(() => {
+                        toast({
+                            title: "¡Éxito!",
+                            description: "Usuario creado correctamente",
+                            variant: "success",
+                        });
+                    })
+                    .catch((error) => {
+                        let errorMessage = "Ocurrió un problema al crear tu cuenta";
+                        if (error?.error?.status === 409) {
+                            errorMessage = "Este correo electrónico ya está registrado";
+                        }
+                        toast({
+                            title: "Error de registro",
+                            description: errorMessage,
+                            variant: "error",
+                        });
+                    })
+            }
         }),
         logout: build.mutation({
             query: () => ({

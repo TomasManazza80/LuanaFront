@@ -58,7 +58,14 @@ export const SignUpAdminCard = () => {
     })
 
     function onSubmit(data) {
-        register({...data, role: 'ADMIN'}).then((res: any) => {
+        const payload = {
+            email: data.email,
+            password: data.password,
+            name: `${data.first_name} ${data.last_name}`,
+            number: "0000000000",
+            role: 'admin'
+        };
+        register(payload).then((res: any) => {
             if (res.data) {
                 login({email: form.getValues('email'), password: form.getValues('password')}).then((res: any) => {
                     if (res.data) {

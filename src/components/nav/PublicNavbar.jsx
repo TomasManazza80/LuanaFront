@@ -192,9 +192,6 @@ export default function PublicNavbar() {
                     </div>
                 </div>
             </div>
-
-                </div>
-            </div>
         </header>
 
         {/* Mobile Navigation Drawer & Overlay */}

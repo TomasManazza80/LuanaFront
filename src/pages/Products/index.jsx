@@ -320,6 +320,7 @@ const Products = () => {
                                         const oldPrice = Math.round(parseFloat(price) * 1.5);
                                         const isInfoproducto = product.esInfoproducto || product.categoria?.toLowerCase() === 'cursos';
                                         const routePrefix = isInfoproducto ? '/curso' : '/product';
+                                        const isLiked = likedProducts.includes(product.id);
 
                                         return (
                                             <Link to={`${routePrefix}/${product.id}`} key={product.id} className="block group h-full gsap-card">

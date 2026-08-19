@@ -37,7 +37,7 @@ const COLOR_MAP = {
   "lavanda": "#E6E6FA"
 };
 
-function ProductDetails() {
+function CourseDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -173,9 +173,9 @@ function ProductDetails() {
         <nav className="flex items-center gap-2 mb-8 text-[10px] md:text-xs font-bold uppercase tracking-widest text-gray-400">
           <Link to="/" className="hover:text-[#3B181E] transition-colors">INICIO</Link>
           <span>/</span>
-          <Link to="/productos" className="hover:text-[#3B181E] transition-colors">TIENDA</Link>
+          <Link to="/productos" className="hover:text-[#3B181E] transition-colors">CURSOS</Link>
           <span>/</span>
-          <span className="text-[#3B181E] truncate">{product.categoria || 'PRODUCTOS'}</span>
+          <span className="text-[#3B181E] truncate">{product.categoria || 'CAPACITACIÓN'}</span>
         </nav>
 
         <div className="flex flex-col lg:flex-row gap-10 lg:gap-16 items-start">
@@ -366,7 +366,7 @@ function ProductDetails() {
             <div className="bg-[#F7F2F3] p-6 rounded-[24px] border border-black/5 mb-6">
               <h3 className="text-xs font-bold uppercase tracking-widest text-[#3B181E] mb-4 flex items-center gap-2">
                 <FontAwesomeIcon icon={faBoxOpen} />
-                ESPECIFICACIONES DEL PRODUCTO
+                ESPECIFICACIONES DEL CURSO
               </h3>
 
               <div className="grid grid-cols-2 gap-4 text-xs mb-4 pb-4 border-b border-black/10">
@@ -389,12 +389,58 @@ function ProductDetails() {
               </div>
 
               <div>
-                <span className="text-gray-400 uppercase text-[10px] font-bold block mb-1">Descripción del Producto</span>
+                <span className="text-gray-400 uppercase text-[10px] font-bold block mb-1">Descripción del Curso</span>
                 <p className="text-xs text-gray-700 leading-relaxed whitespace-pre-line font-medium">
                   {product.descripcion || 'Sin descripción disponible.'}
                 </p>
               </div>
             </div>
+
+            {/* CONTENIDO DEL CURSO / CURRÍCULUM */}
+            {product.esInfoproducto && (
+              <div className="bg-[#F7F2F3] p-6 rounded-[24px] border border-black/5 mb-6">
+                <h3 className="text-xs font-bold uppercase tracking-widest text-[#3B181E] mb-4 flex items-center gap-2">
+                  <FontAwesomeIcon icon={faBoxOpen} />
+                  CONTENIDO INCLUÍDO EN EL CURSO
+                </h3>
+                
+                <div className="space-y-3">
+                  {product.archivosInfoproducto && product.archivosInfoproducto.length > 0 ? (
+                    product.archivosInfoproducto.map((archivo, idx) => (
+                      <div key={idx} className="flex items-center gap-3 p-3 bg-white rounded-xl border border-black/5 shadow-sm">
+                        <div className="w-8 h-8 rounded-full bg-[#3B181E]/10 flex items-center justify-center text-[#3B181E] shrink-0">
+                          <FontAwesomeIcon icon={faCheck} className="text-xs" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-bold text-[#2C2426] truncate">{archivo.name || `Material Didáctico ${idx + 1}`}</p>
+                          <p className="text-[10px] text-gray-400 uppercase tracking-widest">
+                            {archivo.fileType?.includes('video') ? 'Video Lección' : archivo.fileType?.includes('pdf') ? 'Documento PDF' : 'Material Complementario'}
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-xs text-gray-500 font-medium italic">El temario no está disponible públicamente o el curso aún no tiene materiales asignados.</p>
+                  )}
+
+                  {product.speakingActivities && product.speakingActivities.length > 0 && (
+                    <div className="mt-4 pt-4 border-t border-black/10">
+                      <span className="text-gray-400 uppercase text-[10px] font-bold block mb-2">Módulos Prácticos / Evaluaciones</span>
+                      {product.speakingActivities.map((act, idx) => (
+                        <div key={idx} className="flex items-center gap-3 p-3 bg-white rounded-xl border border-black/5 shadow-sm mb-2">
+                           <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 shrink-0">
+                            <FontAwesomeIcon icon={faCheck} className="text-xs" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-bold text-[#2C2426] truncate">{act.title || `Evaluación Práctica ${idx + 1}`}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
           </div>
         </div>
@@ -403,4 +449,4 @@ function ProductDetails() {
   );
 }
 
-export default ProductDetails;
+export default CourseDetails;

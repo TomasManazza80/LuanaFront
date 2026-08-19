@@ -39,6 +39,7 @@ import ConfiguracionMayorista from './configuracionMayorista.jsx';
 import ModuloEmpleados from './empleados/moduloEmpleados.jsx';
 import AdminPronunciation from '../AdminPronunciation.jsx';
 import GestorHomeLive from './gestorHome/GestorHomeLive.jsx';
+import CourseInventory from '../../components/kinesio/CourseInventory.jsx';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -290,6 +291,7 @@ const Admin = () => {
                 { id: 'cargar', label: 'CARGAR PRODUCTOS', icon: <FiPlusCircle /> },
                 { id: 'cargarCursos', label: 'CARGAR CURSOS', icon: <FiBookOpen /> },
                 { id: 'productos', label: 'INVENTARIO PRODUCTOS', icon: <FiPackage /> },
+                { id: 'cursos', label: 'MIS CURSOS', icon: <FiBookOpen /> },
                 { id: 'likes', label: 'POPULARIDAD', icon: <FiHeart /> },
 
               ]
@@ -354,6 +356,7 @@ const Admin = () => {
               {seccionActiva === 'Encargos' && <Encargos />}
               {seccionActiva === 'caja' && <ModuloCaja />}
               {seccionActiva === 'productos' && <InventarioProductos />}
+              {seccionActiva === 'cursos' && <CourseInventory />}
               {seccionActiva === 'cargar' && <CargaDeProductos />}
               {seccionActiva === 'cargarCursos' && <CargaDeCursos />}
               {seccionActiva === 'likes' && <LikesControl />}

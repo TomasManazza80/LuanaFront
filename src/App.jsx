@@ -16,6 +16,9 @@ import MyAppointments from "./components/kinesio/MyAppointments.jsx";
 import Products from "./pages/Products/index.jsx";
 import HOME from "./pages/Home/index.jsx";
 import MisCursos from "./pages/MisCursos/MisCursos.jsx";
+import ProductDetails from "./pages/ProductDetails/ProductDetails.jsx";
+import CourseDetails from "./pages/ProductDetails/CourseDetails.jsx";
+import ProductInventory from "./components/kinesio/ProductInventory.jsx";
 
 import Dashboard from "./components/kinesio/Dashboard.jsx";
 import AppointmentCalendar from "./components/kinesio/AppointmentCalendar.jsx";
@@ -56,7 +59,7 @@ const AppContent = () => {
         return () => clearTimeout(timer);
     }, []);
 
-    const isPublicRoute = location.pathname === '/' || location.pathname === '/login' || location.pathname === '/signup' || location.pathname === '/signup-admin' || location.pathname === '/reservar' || location.pathname === '/mis-turnos' || location.pathname === '/mis-cursos' || location.pathname.startsWith('/productos');
+    const isPublicRoute = location.pathname === '/' || location.pathname === '/login' || location.pathname === '/signup' || location.pathname === '/signup-admin' || location.pathname === '/reservar' || location.pathname === '/mis-turnos' || location.pathname === '/mis-cursos' || location.pathname.startsWith('/productos') || location.pathname.startsWith('/product/') || location.pathname.startsWith('/producto/');
     const showNavbar = !isPublicRoute;
 
     const token = useSelector(state => state.authSlice.accessToken)
@@ -79,6 +82,7 @@ const AppContent = () => {
                         <Route path="/historial/:id?" element={<MedicalHistoryTimeline/>} />
                         <Route path="/historial-turnos" element={<AppointmentHistory/>} />
                         <Route path="/perfil" element={<UserProfile/>} />
+                        <Route path="/inventario" element={<ProductInventory/>} />
                     </Routes>
                 </Navbar>)}
                 {!showNavbar && (
@@ -90,7 +94,11 @@ const AppContent = () => {
                         <Route path="/reservar" element={<BookingPage/>} />
                         <Route path="/mis-turnos" element={<MyAppointments/>} />
                         <Route path="/mis-cursos" element={<MisCursos/>} />
+                        <Route path="/productos" element={<Products/>} />
                         <Route path="/productos/*" element={<Products/>} />
+                        <Route path="/product/:id" element={<ProductDetails/>} />
+                        <Route path="/producto/:id" element={<ProductDetails/>} />
+                        <Route path="/curso/:id" element={<CourseDetails/>} />
                     </Routes>
                 )}
 

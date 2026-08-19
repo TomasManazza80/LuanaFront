@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { 
     LogOut, Settings, Bell, Users, Calendar, 
     FileText, Home, Menu, X, ChevronLeft, ChevronRight, Clock, UserCheck, Shield, GripVertical,
-    PackagePlus, GraduationCap, Globe
+    PackagePlus, Package, GraduationCap, Globe
 } from "lucide-react";
 import { logoutUser } from "../../services/auth/authActions.js";
 
@@ -103,13 +103,19 @@ const Navbar = ({ children }) => {
             icon: PackagePlus
         },
         {
+            path: '/inventario',
+            title: 'Inventario de Productos',
+            icon: Package
+        },
+        {
             path: '/dashboard?tab=cargarCursos',
             tab: 'cargarCursos',
             title: 'Cargar Cursos',
             icon: GraduationCap
         },
         {
-            path: '/mis-cursos',
+            path: '/dashboard?tab=cursos',
+            tab: 'cursos',
             title: 'Ver Mis Cursos',
             icon: GraduationCap
         },

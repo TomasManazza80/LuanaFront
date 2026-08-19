@@ -11,7 +11,7 @@ import {
     faChevronRight,
     faQuoteLeft
 } from "@fortawesome/free-solid-svg-icons";
-import { faWhatsapp } from "@fortawesome/free-brands-svg-icons";
+import { FaWhatsapp } from "react-icons/fa6";
 
 const PortfolioEncargos = () => {
     const WHATSAPP_NUMBER = "5491112345678";
@@ -176,7 +176,7 @@ const PortfolioEncargos = () => {
                         rel="noopener noreferrer"
                         className="group flex items-center gap-4 bg-gradient-to-r from-[#cba394] to-[#b07d6b] px-12 py-5 text-xs font-normal uppercase tracking-[0.2em] text-white shadow-md transition-all duration-300 hover:shadow-lg hover:opacity-90 rounded-sm"
                     >
-                        <FontAwesomeIcon icon={faWhatsapp} className="text-lg font-light" />
+                        <FaWhatsapp className="text-lg font-light" />
                         <span>Agendar un Proyecto</span>
                     </a>
                 </motion.div>

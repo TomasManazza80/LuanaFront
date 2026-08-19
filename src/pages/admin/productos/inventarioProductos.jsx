@@ -42,7 +42,7 @@ const optimizeImage = (url, width = 800) => {
 };
 
 // --- COMPONENTE: FORMULARIO DE EDICIÓN ---
-const FormularioEditarModal = ({ producto, onClose, onSave, proveedores, categorias, pronunciationActivities, fetchPronunciationActivities }) => {
+export const FormularioEditarModal = ({ producto, onClose, onSave, proveedores, categorias, pronunciationActivities, fetchPronunciationActivities }) => {
   const [editado, setEditado] = useState({
     ...producto,
     variantes: producto.variantes || [],
@@ -548,7 +548,15 @@ const InventarioProductos = () => {
     try {
       setLoading(true);
       const response = await axios.get(`${import.meta.env.VITE_API_URL}/products`);
-      setProductos(response.data);
+      const allData = response.data.products || response.data || [];
+      const onlyProducts = allData.filter(p => {
+          const isCourse = p.esInfoproducto === true || 
+                           String(p.esInfoproducto) === 'true' || 
+                           (p.categoria && p.categoria.toLowerCase() === 'cursos') || 
+                           (Array.isArray(p.archivosInfoproducto) && p.archivosInfoproducto.length > 0);
+          return !isCourse;
+      });
+      setProductos(onlyProducts);
       setError(null);
     } catch (err) {
       setError("ERROR DE CONEXIÓN");

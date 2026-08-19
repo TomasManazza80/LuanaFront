@@ -262,7 +262,7 @@ const Products = () => {
         }
     }, { scope: gridRef, dependencies: [isLoading, filteredProducts] });
 
-    const formatPrice = (price) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', minimumFractionDigits: 0 }).format(price).replace('ARS', '$');
+    const formatPrice = (price) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', minimumFractionDigits: 0 }).format(price).replace('ARS', '$ ');
 
     const resetFilters = () => {
         setSearch(""); setCategory(""); setBrand(""); setSortOption(""); setMinPrice(""); setMaxPrice("");
@@ -317,36 +317,85 @@ const Products = () => {
                                     filteredProducts.map((product) => {
                                         const stockVariant = product.variantes?.find(v => Number(v.stock) > 0) || (product.variantes?.length > 0 ? product.variantes[0] : null);
                                         const price = stockVariant?.precioAlPublico || product.precioVenta || 0;
-                                        const oldPrice = parseFloat(price) * 1.5; // Placeholder for original price to show discount
+                                        const oldPrice = Math.round(parseFloat(price) * 1.5);
+                                        const isInfoproducto = product.esInfoproducto || product.categoria?.toLowerCase() === 'cursos';
+                                        const routePrefix = isInfoproducto ? '/curso' : '/product';
 
                                         return (
-                                            <Link to={`/product/${product.id}`} key={product.id} className="block group h-full gsap-card">
-                                                <div className="h-full flex flex-col relative bg-transparent overflow-hidden">
+                                            <Link to={`${routePrefix}/${product.id}`} key={product.id} className="block group h-full gsap-card">
+                                                <div className="h-full flex flex-col relative bg-[#F7F2F3] rounded-[24px] md:rounded-[32px] p-3 md:p-4 transition-all duration-300 hover:-translate-y-1 shadow-sm border border-black/[0.03] overflow-hidden">
                                                     
                                                     {/* IMAGE SECTION */}
-                                                    <div className="relative w-full aspect-square bg-[#f5f5f5] overflow-hidden mb-4">
+                                                    <div className="relative w-full aspect-square rounded-[18px] md:rounded-[24px] overflow-hidden bg-white/60 mb-3 md:mb-4">
                                                         <img
                                                             src={optimizeImage(product.imagenes?.[0] || product.image)}
                                                             alt={product.nombre}
                                                             loading="lazy"
-                                                            className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                                                         />
+
+                                                        {/* HEART / LIKE BUTTON */}
+                                                        <button
+                                                            onClick={(e) => handleToggleLike(e, product.id)}
+                                                            className={`absolute top-2.5 right-2.5 w-7 h-7 md:w-8 md:h-8 rounded-full backdrop-blur-md flex items-center justify-center transition-all duration-300 shadow-sm ${
+                                                                isLiked
+                                                                    ? "bg-white text-red-500 scale-110"
+                                                                    : "bg-white/70 text-gray-400 hover:text-gray-600 hover:bg-white"
+                                                            }`}
+                                                            title="Favorito"
+                                                        >
+                                                            <FiHeart className={`w-3.5 h-3.5 md:w-4 md:h-4 ${isLiked ? "fill-current" : ""}`} />
+                                                        </button>
+
+                                                        {/* COLOR SWATCH PILL */}
+                                                        {product.variantes && product.variantes.length > 0 && (
+                                                            <div className="absolute bottom-2.5 left-2.5 bg-white/80 backdrop-blur-md rounded-full px-2.5 py-1 flex items-center gap-1.5 shadow-sm border border-white/60">
+                                                                <span className="w-2.5 h-2.5 rounded-full bg-[#E5C365] border border-black/10 inline-block"></span>
+                                                                <span className="w-2.5 h-2.5 rounded-full bg-[#2B2B2B] inline-block"></span>
+                                                                <span className="w-2.5 h-2.5 rounded-full bg-[#7CA2C4] inline-block"></span>
+                                                                {product.variantes.length > 1 && (
+                                                                    <span className="text-[9px] font-bold text-gray-500 ml-0.5">+{product.variantes.length}</span>
+                                                                )}
+                                                            </div>
+                                                        )}
                                                     </div>
 
                                                     {/* INFO SECTION */}
-                                                    <div className="flex flex-col flex-1">
-                                                        <h3 className="text-sm text-[#333333] font-medium tracking-tight mb-1 line-clamp-1">{product.nombre}</h3>
-                                                        <span className="text-sm text-gray-600 mb-4">{formatPrice(price)}</span>
+                                                    <div className="flex flex-col flex-1 px-1">
+                                                        <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-0.5 block truncate">
+                                                            {product.categoria || "VELAS"}
+                                                        </span>
 
-                                                        <div className="mt-auto pt-2">
-                                                            <button 
+                                                        <h3 className="text-xs md:text-sm font-bold uppercase tracking-wide text-[#2C2426] line-clamp-1 mb-0.5">
+                                                            {product.nombre}
+                                                        </h3>
+
+                                                        <span className="text-[10px] md:text-xs text-gray-400 font-normal mb-3 block truncate">
+                                                            {product.marca || "Lu petruccelli"}
+                                                        </span>
+
+                                                        <div className="mt-auto flex items-center justify-between pt-1">
+                                                            <div className="flex items-baseline gap-1.5 flex-wrap">
+                                                                <span className="text-sm md:text-base lg:text-lg font-bold text-[#2C2426]">
+                                                                    {formatPrice(price)}
+                                                                </span>
+                                                                {oldPrice && (
+                                                                    <span className="text-[10px] md:text-xs text-gray-400 line-through font-normal">
+                                                                        {formatPrice(oldPrice)}
+                                                                    </span>
+                                                                )}
+                                                            </div>
+
+                                                            <button
                                                                 onClick={(e) => {
                                                                     e.preventDefault();
-                                                                    // add to cart logic would go here
+                                                                    e.stopPropagation();
+                                                                    // cart logic
                                                                 }}
-                                                                className="w-full border border-[#333333] py-3 text-[10px] md:text-xs font-bold text-[#333333] tracking-widest hover:bg-[#333333] hover:text-white transition-colors"
+                                                                className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-[#2A2426] hover:bg-[#4A3B3E] text-white flex items-center justify-center transition-colors shadow-md flex-shrink-0"
+                                                                title="Agregar al carrito"
                                                             >
-                                                                ADD TO CART
+                                                                <FiShoppingCart className="w-3.5 h-3.5 md:w-4 md:h-4" />
                                                             </button>
                                                         </div>
                                                     </div>

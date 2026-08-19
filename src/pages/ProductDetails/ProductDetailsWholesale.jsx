@@ -19,8 +19,7 @@ import {
     faInfoCircle
 } from "@fortawesome/free-solid-svg-icons";
 
-// CORRECCIÓN: WhatsApp se importa de free-brands-svg-icons
-import { faWhatsapp } from "@fortawesome/free-brands-svg-icons";
+import { FaWhatsapp } from "react-icons/fa6";
 import { motion, AnimatePresence } from "framer-motion";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -391,7 +390,7 @@ const ProductDetailsWholesale = () => {
                         {/* BOTÓN SECUNDARIO WHATSAPP FLUJO NORMAL */}
                         <div className="mb-8 md:mb-0 md:mt-0">
                             <button onClick={() => window.open('https://wa.me/+543425937358', '_blank')} className="w-full h-14 glass-panel rounded-[1rem] md:rounded-[1.5rem] f-title text-[10px] tracking-widest flex items-center justify-center gap-3 hover:bg-zinc-800 transition-all border border-white/5">
-                                <FontAwesomeIcon icon={faWhatsapp} className="text-green-500 text-xl" /> CONSULTA_WHATSAPP
+                                <FaWhatsapp className="text-green-500 text-xl" /> CONSULTA_WHATSAPP
                             </button>
                         </div>
 

@@ -724,18 +724,18 @@ const HOME = () => {
                   whileHover={{ y: -6 }}
                   transition={{ duration: 0.3 }}
                   className="bg-[#F3ECE7] rounded-2xl overflow-hidden border border-[#3D1A20]/10 shadow-sm flex flex-col group cursor-pointer"
-                  onClick={() => navigate('/productos')}
+                  onClick={() => navigate(`/product/${prod.id || prod._id}`)}
                 >
                   <div className="w-full aspect-square bg-[#D8C7B8] overflow-hidden relative">
                     <img
-                      src={prod.imagen || prod.image || "https://images.unsplash.com/photo-1599940824399-b87987ceb72a?q=80&w=600&auto=format&fit=crop"}
+                      src={prod.imagen || prod.image || (prod.imagenes && prod.imagenes[0]) || "https://images.unsplash.com/photo-1599940824399-b87987ceb72a?q=80&w=600&auto=format&fit=crop"}
                       alt={prod.nombre || prod.title}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                       loading="lazy"
                     />
-                    {prod.precio ? (
+                    {(prod.precio || prod.precioVenta) ? (
                       <span className="absolute top-3 right-3 bg-[#3D1A20] text-[#F3ECE7] text-xs font-bold px-2.5 py-1 rounded-full shadow">
-                        ${Number(prod.precio).toLocaleString('es-AR')}
+                        ${Number(prod.precio || prod.precioVenta).toLocaleString('es-AR')}
                       </span>
                     ) : null}
                   </div>
@@ -753,10 +753,10 @@ const HOME = () => {
                     </div>
 
                     <button
-                      onClick={(e) => { e.stopPropagation(); navigate('/productos'); }}
+                      onClick={(e) => { e.stopPropagation(); navigate(`/product/${prod.id || prod._id}`); }}
                       className="mt-4 w-full py-2 bg-[#3D1A20] text-[#F3ECE7] text-[10px] md:text-xs font-bold uppercase tracking-widest rounded-xl hover:bg-[#2E1318] transition-colors"
                     >
-                      VER EN TIENDA
+                      VER DETALLES
                     </button>
                   </div>
                 </motion.div>

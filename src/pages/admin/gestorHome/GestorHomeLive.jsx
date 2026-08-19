@@ -4,7 +4,7 @@ import { IKContext, IKUpload } from 'imagekitio-react';
 import {
   FiEdit3, FiSave, FiRefreshCw, FiEye, FiSmartphone, FiMonitor, FiTablet,
   FiCheck, FiSliders, FiImage, FiType, FiLayers, FiHelpCircle, FiArrowRight,
-  FiUploadCloud, FiTrash2, FiLink, FiLoader, FiNavigation
+  FiUploadCloud, FiTrash2, FiLink, FiLoader, FiNavigation, FiPlus
 } from 'react-icons/fi';
 import videoHero from '../../../media/video1.mp4';
 
@@ -760,8 +760,20 @@ export default function GestorHomeLive() {
                               }}
                               className="w-full h-full"
                             >
-                              <img src={item.image} alt={item.title} className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-300" />
+                              <img src={item.image || "https://images.unsplash.com/photo-1519014816548-bf5fe059798b?q=80&w=800&auto=format&fit=crop"} alt={item.title} className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-300" />
                             </InlineMediaUploader>
+                            <button
+                                onClick={() => {
+                                  if(window.confirm("¿Eliminar este servicio?")) {
+                                    const newItems = content.manicureSection.items.filter((_, index) => index !== i);
+                                    updateField('manicureSection.items', newItems);
+                                  }
+                                }}
+                                className="absolute top-2 right-2 bg-rose-500 text-white p-1.5 rounded-md opacity-0 group-hover/img:opacity-100 transition-opacity z-10 shadow-md hover:bg-rose-600"
+                                title="Eliminar servicio"
+                            >
+                                <FiTrash2 size={12} />
+                            </button>
                           </div>
                           <div className="space-y-1 px-0.5">
                             <p className="font-bold text-xs text-[#3D1A20] truncate">
@@ -788,6 +800,24 @@ export default function GestorHomeLive() {
                         </div>
                       </div>
                     ))}
+                    {/* Botón para Añadir Nuevo Servicio */}
+                    <div 
+                      onClick={() => {
+                        const newItems = [...content.manicureSection.items, {
+                          id: Date.now(),
+                          title: "NUEVO SERVICIO",
+                          subtitle: "SUBTÍTULO",
+                          image: ""
+                        }];
+                        updateField('manicureSection.items', newItems);
+                      }}
+                      className="bg-slate-50/50 p-2.5 rounded-xl border-2 border-dashed border-slate-300 hover:border-[#0A58CA] hover:bg-slate-50 transition-all flex flex-col justify-center items-center group shadow-sm cursor-pointer min-h-[220px]"
+                    >
+                      <div className="w-12 h-12 rounded-full bg-slate-200 group-hover:bg-[#0A58CA] flex items-center justify-center text-slate-400 group-hover:text-white transition-colors mb-2">
+                        <FiPlus size={24} />
+                      </div>
+                      <p className="font-bold text-xs text-slate-500 group-hover:text-[#0A58CA] transition-colors uppercase">Añadir Servicio</p>
+                    </div>
                   </div>
                 </div>
               </section>
@@ -829,11 +859,24 @@ export default function GestorHomeLive() {
                             {slide.image ? (
                               <img src={slide.image} alt={slide.title} className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-300" />
                             ) : (
-                              <div className="w-full h-full flex items-center justify-center text-[#E5D8CC]/40">
+                              <div className="w-full h-full flex items-center justify-center text-[#E5D8CC]/40 bg-[#1A0B0E]">
                                 <FiImage size={18} />
                               </div>
                             )}
                           </InlineMediaUploader>
+                          <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if(window.confirm("¿Eliminar este tratamiento?")) {
+                                  const newSlides = content.pedicureSection.slides.filter((_, index) => index !== idx);
+                                  updateField('pedicureSection.slides', newSlides);
+                                }
+                              }}
+                              className="absolute top-1 right-1 bg-rose-500/90 text-white p-1 rounded-md opacity-0 group-hover/img:opacity-100 transition-opacity z-10 shadow hover:bg-rose-600"
+                              title="Eliminar tratamiento"
+                          >
+                              <FiTrash2 size={10} />
+                          </button>
                         </div>
                         <div className="overflow-hidden flex-1 space-y-1">
                           <p className="font-bold text-xs text-[#E5D8CC] truncate">
@@ -859,6 +902,24 @@ export default function GestorHomeLive() {
                         </div>
                       </div>
                     ))}
+                    {/* Botón para Añadir Nuevo Tratamiento */}
+                    <div 
+                      onClick={() => {
+                        const newSlides = [...content.pedicureSection.slides, {
+                          id: Date.now(),
+                          title: "NUEVO TRATAMIENTO",
+                          subtitle: "SUBTÍTULO",
+                          image: ""
+                        }];
+                        updateField('pedicureSection.slides', newSlides);
+                      }}
+                      className="bg-[#2E1318]/50 p-3 rounded-xl border-2 border-dashed border-[#E5D8CC]/20 hover:border-[#E5D8CC]/60 transition-all flex items-center justify-center gap-3 shadow-lg cursor-pointer min-h-[90px]"
+                    >
+                      <div className="flex flex-col items-center justify-center text-[#E5D8CC]/50 hover:text-[#E5D8CC] transition-colors py-2">
+                        <FiPlus size={24} className="mb-1" />
+                        <p className="font-bold text-[10px] tracking-widest uppercase">Añadir Tratamiento</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </section>

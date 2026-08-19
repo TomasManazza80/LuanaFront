@@ -208,16 +208,13 @@ const MisCursos = () => {
                     >
                         <div className="text-center mb-14">
                             <div className="inline-block bg-[#2E1318] text-[#E8DDD3] px-5 py-2 rounded-full text-xs font-bold tracking-widest mb-4 shadow-sm border border-[#E8DDD3]/20 uppercase">
-                                {userRole === 'ADMIN' ? 'VISTA DE ADMINISTRADOR' : 'MI CENTRO DE APRENDIZAJE'}
+                                MI CENTRO DE APRENDIZAJE
                             </div>
                             <h1 className="text-4xl md:text-5xl font-extrabold text-[#E8DDD3] tracking-tight leading-tight uppercase">
                                 MIS <span className="text-white underline decoration-2 underline-offset-8">CURSOS</span>
                             </h1>
                             <p className="mt-4 text-[#E8DDD3]/80 font-medium max-w-xl mx-auto text-sm md:text-base">
-                                {userRole === 'ADMIN' 
-                                    ? 'Como administrador tienes acceso a todos los cursos y capacitaciones del sistema.'
-                                    : 'Accede al contenido exclusivo de los cursos y capacitaciones que has adquirido.'
-                                }
+                                Accede al contenido exclusivo de los cursos y capacitaciones que has adquirido.
                             </p>
                         </div>
 
@@ -238,23 +235,14 @@ const MisCursos = () => {
                             <div className="text-center py-16 bg-[#2E1318] rounded-[30px] shadow-2xl border border-[#E8DDD3]/20 max-w-2xl mx-auto px-6">
                                 <div className="text-5xl mb-4">🎓</div>
                                 <h3 className="text-xl font-bold text-white mb-2">
-                                    {userRole === 'ADMIN' ? 'No Hay Cursos Cargados' : 'Aún no tienes Cursos Adquiridos'}
+                                    Aún no tienes Cursos Adquiridos
                                 </h3>
                                 <p className="text-[#E8DDD3]/70 text-sm font-medium mb-6">
-                                    {userRole === 'ADMIN' 
-                                        ? 'Puedes cargar nuevos cursos y capacitaciones desde el Panel de Administración.'
-                                        : 'Una vez que compres un curso o capacitación, aparecerá aquí con todo su contenido interactivo.'
-                                    }
+                                    Una vez que compres un curso o capacitación, aparecerá aquí con todo su contenido interactivo.
                                 </p>
-                                {userRole === 'ADMIN' ? (
-                                    <button onClick={() => navigate('/dashboard?tab=cargarCursos')} className="bg-[#E8DDD3] hover:bg-white text-[#3D1A20] px-8 py-3.5 rounded-full font-bold shadow-lg transition-all hover:scale-105 uppercase text-xs tracking-wider">
-                                        Cargar Nuevos Cursos
-                                    </button>
-                                ) : (
-                                    <button onClick={() => navigate('/#cursos-admin')} className="bg-[#E8DDD3] hover:bg-white text-[#3D1A20] px-8 py-3.5 rounded-full font-bold shadow-lg transition-all hover:scale-105 uppercase text-xs tracking-wider">
-                                        Explorar Cursos Disponibles
-                                    </button>
-                                )}
+                                <button onClick={() => navigate('/#cursos-admin')} className="bg-[#E8DDD3] hover:bg-white text-[#3D1A20] px-8 py-3.5 rounded-full font-bold shadow-lg transition-all hover:scale-105 uppercase text-xs tracking-wider">
+                                    Explorar Cursos Disponibles
+                                </button>
                             </div>
                         ) : (
                             <div ref={gridRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
@@ -269,14 +257,14 @@ const MisCursos = () => {
                                                 <img src={curso.imagenes[0]?.url || curso.imagenes[0]} alt={curso.nombre} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                                                 <div className="absolute top-4 left-4">
                                                     <span className="bg-[#3D1A20]/90 backdrop-blur-md text-[#E8DDD3] text-[10px] font-extrabold px-3 py-1 rounded-full shadow-md uppercase tracking-wider border border-[#E8DDD3]/30">
-                                                        {userRole === 'ADMIN' ? 'ACCESO ADMIN' : 'CURSO PAGADO'}
+                                                        CURSO PAGADO
                                                     </span>
                                                 </div>
                                             </div>
                                         ) : (
                                             <div className="h-48 bg-gradient-to-br from-[#2E1318] to-[#1E0B0E] relative border-b border-[#E8DDD3]/10 flex items-center justify-center group-hover:bg-[#3D1A20] transition-colors">
                                                 <span className="bg-[#3D1A20]/90 backdrop-blur-md text-[#E8DDD3] text-[10px] font-extrabold px-3 py-1 rounded-full shadow-md uppercase tracking-wider border border-[#E8DDD3]/30 absolute top-4 left-4">
-                                                    {userRole === 'ADMIN' ? 'ACCESO ADMIN' : 'CURSO PAGADO'}
+                                                    CURSO PAGADO
                                                 </span>
                                                 <FontAwesomeIcon icon={faVideo} className="text-4xl text-[#E8DDD3] opacity-40 group-hover:opacity-70 transition-opacity" />
                                             </div>

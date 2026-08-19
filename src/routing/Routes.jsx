@@ -74,9 +74,7 @@ function MyRoutes() {
           <Route path="cart" element={<Cart />} />
           <Route path="cart-wholesale" element={<CartWholesale />} />
           <Route path="producto-mayorista/:id" element={<ProductDetailsWholesale />} />
-          <Route path="product/:id" element={<ProductDetails />}>
-            <Route index element={<Fproduct />} />
-          </Route>
+          <Route path="product/:id" element={<ProductDetails />} />
           <Route path="products" element={<Products />}></Route>
           <Route path="success" element={<PagoExitoso />} />
           <Route path="about" element={<About />} />

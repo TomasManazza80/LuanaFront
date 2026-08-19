@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, User } from 'lucide-react';
+import { Menu, X, User, ShoppingCart } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { logout } from '../../services/auth/authSlice.js';
@@ -148,12 +148,21 @@ export default function PublicNavbar() {
                 </nav>
 
                 {/* Right: Reserve Button & User Profile */}
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3 md:gap-4">
                     <button 
                         onClick={() => navigate('/reservar')}
-                        className={`text-xs uppercase tracking-widest font-bold bg-[#E8DDD3] text-[#3D1A20] px-5 py-2.5 rounded-full hover:bg-white transition-all transform hover:scale-105 shadow-sm ${isReservar ? 'ring-2 ring-white' : ''}`}
+                        className={`text-xs uppercase tracking-widest font-bold bg-[#E8DDD3] text-[#3D1A20] px-4 md:px-5 py-2 md:py-2.5 rounded-full hover:bg-white transition-all transform hover:scale-105 shadow-sm ${isReservar ? 'ring-2 ring-white' : ''}`}
                     >
-                        RESERVAR AHORA
+                        <span className="hidden sm:inline">RESERVAR AHORA</span>
+                        <span className="sm:hidden">RESERVAR</span>
+                    </button>
+
+                    <button 
+                        onClick={() => navigate('/cart')}
+                        className="w-8 h-8 rounded-full border border-[#E8DDD3]/40 bg-[#3D1A20] flex justify-center items-center hover:border-white transition-colors cursor-pointer"
+                        aria-label="Carrito de compras"
+                    >
+                        <ShoppingCart size={16} className="text-[#E8DDD3]" />
                     </button>
 
                     <div className="relative">

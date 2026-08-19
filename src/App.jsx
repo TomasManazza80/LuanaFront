@@ -19,6 +19,7 @@ import MisCursos from "./pages/MisCursos/MisCursos.jsx";
 import ProductDetails from "./pages/ProductDetails/ProductDetails.jsx";
 import CourseDetails from "./pages/ProductDetails/CourseDetails.jsx";
 import ProductInventory from "./components/kinesio/ProductInventory.jsx";
+import Cart from "./pages/Cart/Cart.jsx";
 
 import Dashboard from "./components/kinesio/Dashboard.jsx";
 import AppointmentCalendar from "./components/kinesio/AppointmentCalendar.jsx";
@@ -59,7 +60,7 @@ const AppContent = () => {
         return () => clearTimeout(timer);
     }, []);
 
-    const isPublicRoute = location.pathname === '/' || location.pathname === '/login' || location.pathname === '/signup' || location.pathname === '/signup-admin' || location.pathname === '/reservar' || location.pathname === '/mis-turnos' || location.pathname === '/mis-cursos' || location.pathname.startsWith('/productos') || location.pathname.startsWith('/product/') || location.pathname.startsWith('/producto/');
+    const isPublicRoute = location.pathname === '/' || location.pathname === '/cart' || location.pathname === '/login' || location.pathname === '/signup' || location.pathname === '/signup-admin' || location.pathname === '/reservar' || location.pathname === '/mis-turnos' || location.pathname === '/mis-cursos' || location.pathname.startsWith('/productos') || location.pathname.startsWith('/product/') || location.pathname.startsWith('/producto/');
     const showNavbar = !isPublicRoute;
 
     const token = useSelector(state => state.authSlice.accessToken)
@@ -99,6 +100,7 @@ const AppContent = () => {
                         <Route path="/product/:id" element={<ProductDetails/>} />
                         <Route path="/producto/:id" element={<ProductDetails/>} />
                         <Route path="/curso/:id" element={<CourseDetails/>} />
+                        <Route path="/cart" element={<Cart/>} />
                     </Routes>
                 )}
 

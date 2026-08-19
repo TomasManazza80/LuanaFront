@@ -72,6 +72,7 @@ export default function PublicNavbar() {
     }, [location]);
 
     return (
+        <>
         <header className="w-full bg-[#3D1A20]/95 backdrop-blur-md text-[#E8DDD3] fixed top-0 left-0 right-0 z-[1000] shadow-md transition-all duration-300">
             <div className="max-w-[1400px] mx-auto px-6 py-4 md:px-10 flex items-center justify-between">
                 
@@ -192,94 +193,98 @@ export default function PublicNavbar() {
                 </div>
             </div>
 
-            {/* Mobile Navigation Drawer & Overlay */}
-            <div 
-                className={`fixed inset-0 bg-black/60 z-40 transition-opacity duration-300 md:hidden ${isMobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}
-                onClick={() => setIsMobileMenuOpen(false)}
-            ></div>
-
-            <div 
-                className={`fixed top-0 left-0 h-full w-[280px] bg-[#3D1A20] text-[#E8DDD3] z-50 transform transition-transform duration-300 ease-in-out md:hidden shadow-2xl flex flex-col ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}
-            >
-                <div className="flex items-center justify-between p-6 border-b border-[#E8DDD3]/10">
-                    <div className="flex items-center gap-3">
-                        <img 
-                            src="/images/logoLuan.jpeg" 
-                            alt="Luan Studio" 
-                            className="w-8 h-8 rounded-full object-cover border border-[#E8DDD3]/40"
-                        />
-                        <span className="text-lg font-bold font-serif text-[#E8DDD3]">Luan Studio</span>
-                    </div>
-                    <button onClick={() => setIsMobileMenuOpen(false)} className="text-[#E8DDD3] hover:text-white transition-colors">
-                        <X size={24} />
-                    </button>
-                </div>
-                <div className="flex flex-col p-6 gap-6 text-xs uppercase tracking-widest">
-                    <button 
-                        onClick={() => handleSectionClick('inicio')} 
-                        className={`text-left font-semibold transition-colors ${isInicio ? 'text-white font-bold' : 'text-[#E8DDD3]/80 hover:text-white'}`}
-                    >
-                        INICIO
-                    </button>
-                    <button 
-                        onClick={() => handleSectionClick('manicure')} 
-                        className="text-left font-semibold text-[#E8DDD3]/80 hover:text-white transition-colors"
-                    >
-                        MANICURE
-                    </button>
-                    <button 
-                        onClick={() => handleSectionClick('pedicure')} 
-                        className="text-left font-semibold text-[#E8DDD3]/80 hover:text-white transition-colors"
-                    >
-                        PEDICURE
-                    </button>
-                    <button 
-                        onClick={() => { setIsMobileMenuOpen(false); navigate('/productos'); }} 
-                        className={`text-left font-semibold transition-colors ${isProductos ? 'text-white font-bold' : 'text-[#E8DDD3]/80 hover:text-white'}`}
-                    >
-                        TIENDA
-                    </button>
-                    <button 
-                        onClick={() => { setIsMobileMenuOpen(false); navigate('/mis-turnos'); }} 
-                        className={`text-left font-semibold transition-colors ${isMisTurnos ? 'text-white font-bold' : 'text-[#E8DDD3]/80 hover:text-white'}`}
-                    >
-                        MIS TURNOS
-                    </button>
-                    <button 
-                        onClick={() => { setIsMobileMenuOpen(false); navigate('/mis-cursos'); }} 
-                        className={`text-left font-semibold transition-colors ${isMisCursos ? 'text-white font-bold' : 'text-[#E8DDD3]/80 hover:text-white'}`}
-                    >
-                        MIS CURSOS
-                    </button>
-                    
-                    {userInfo?.role?.toUpperCase() === 'ADMIN' || userInfo?.role?.toUpperCase() === 'EMPLOYEE' ? (
-                        <button 
-                            onClick={() => { setIsMobileMenuOpen(false); navigate('/dashboard'); }}
-                            className="text-left font-bold text-[#E8DDD3] transition-colors"
-                        >
-                            PANEL ADMIN
-                        </button>
-                    ) : null}
-
-                    <div className="h-px bg-[#E8DDD3]/10 w-full my-2"></div>
-
-                    {accessToken ? (
-                        <button 
-                            onClick={() => { setIsMobileMenuOpen(false); handleLogout(); }}
-                            className="text-left font-semibold text-red-300 transition-colors"
-                        >
-                            Cerrar Sesión
-                        </button>
-                    ) : (
-                        <button 
-                            onClick={() => { setIsMobileMenuOpen(false); navigate('/login'); }}
-                            className="text-left font-semibold text-[#E8DDD3] transition-colors"
-                        >
-                            Iniciar Sesión
-                        </button>
-                    )}
                 </div>
             </div>
         </header>
+
+        {/* Mobile Navigation Drawer & Overlay */}
+        <div 
+            className={`fixed inset-0 bg-black/60 z-[1010] transition-opacity duration-300 md:hidden ${isMobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}
+            onClick={() => setIsMobileMenuOpen(false)}
+        ></div>
+
+        <div 
+            className={`fixed top-0 left-0 h-[100dvh] w-[280px] bg-[#3D1A20] text-[#E8DDD3] z-[1020] transform transition-transform duration-300 ease-in-out md:hidden shadow-2xl flex flex-col ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}
+        >
+            <div className="flex items-center justify-between p-6 border-b border-[#E8DDD3]/10">
+                <div className="flex items-center gap-3">
+                    <img 
+                        src="/images/logoLuan.jpeg" 
+                        alt="Luan Studio" 
+                        className="w-8 h-8 rounded-full object-cover border border-[#E8DDD3]/40"
+                    />
+                    <span className="text-lg font-bold font-serif text-[#E8DDD3]">Luan Studio</span>
+                </div>
+                <button onClick={() => setIsMobileMenuOpen(false)} className="text-[#E8DDD3] hover:text-white transition-colors">
+                    <X size={24} />
+                </button>
+            </div>
+            <div className="flex flex-col p-6 gap-6 text-xs uppercase tracking-widest overflow-y-auto">
+                <button 
+                    onClick={() => handleSectionClick('inicio')} 
+                    className={`text-left font-semibold transition-colors ${isInicio ? 'text-white font-bold' : 'text-[#E8DDD3]/80 hover:text-white'}`}
+                >
+                    INICIO
+                </button>
+                <button 
+                    onClick={() => handleSectionClick('manicure')} 
+                    className="text-left font-semibold text-[#E8DDD3]/80 hover:text-white transition-colors"
+                >
+                    MANICURE
+                </button>
+                <button 
+                    onClick={() => handleSectionClick('pedicure')} 
+                    className="text-left font-semibold text-[#E8DDD3]/80 hover:text-white transition-colors"
+                >
+                    PEDICURE
+                </button>
+                <button 
+                    onClick={() => { setIsMobileMenuOpen(false); navigate('/productos'); }} 
+                    className={`text-left font-semibold transition-colors ${isProductos ? 'text-white font-bold' : 'text-[#E8DDD3]/80 hover:text-white'}`}
+                >
+                    TIENDA
+                </button>
+                <button 
+                    onClick={() => { setIsMobileMenuOpen(false); navigate('/mis-turnos'); }} 
+                    className={`text-left font-semibold transition-colors ${isMisTurnos ? 'text-white font-bold' : 'text-[#E8DDD3]/80 hover:text-white'}`}
+                >
+                    MIS TURNOS
+                </button>
+                <button 
+                    onClick={() => { setIsMobileMenuOpen(false); navigate('/mis-cursos'); }} 
+                    className={`text-left font-semibold transition-colors ${isMisCursos ? 'text-white font-bold' : 'text-[#E8DDD3]/80 hover:text-white'}`}
+                >
+                    MIS CURSOS
+                </button>
+                
+                {userInfo?.role?.toUpperCase() === 'ADMIN' || userInfo?.role?.toUpperCase() === 'EMPLOYEE' ? (
+                    <button 
+                        onClick={() => { setIsMobileMenuOpen(false); navigate('/dashboard'); }}
+                        className="text-left font-bold text-[#E8DDD3] transition-colors"
+                    >
+                        PANEL ADMIN
+                    </button>
+                ) : null}
+
+                <div className="h-px bg-[#E8DDD3]/10 w-full my-2"></div>
+
+                {accessToken ? (
+                    <button 
+                        onClick={() => { setIsMobileMenuOpen(false); handleLogout(); }}
+                        className="text-left font-semibold text-red-300 transition-colors"
+                    >
+                        Cerrar Sesión
+                    </button>
+                ) : (
+                    <button 
+                        onClick={() => { setIsMobileMenuOpen(false); navigate('/login'); }}
+                        className="text-left font-semibold text-[#E8DDD3] transition-colors"
+                    >
+                        Iniciar Sesión
+                    </button>
+                )}
+            </div>
+        </div>
+        </>
     );
 }

@@ -29,7 +29,7 @@ const LoginCard = () => {
 
     const loginFormSchema = z.object({
         email: z.string().email({message: 'Por favor, introduce un correo electrónico válido'}),
-        password: z.string().min(8, {message: 'La contraseña debe tener al menos 8 caracteres'}),
+        password: z.string().min(6, {message: 'La contraseña debe tener al menos 6 caracteres'}),
     })
 
     const form = useForm({

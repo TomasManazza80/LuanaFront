@@ -2,12 +2,121 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PAUSES</title>
+    
+    <!-- SEO Meta Tags -->
+    <title>Luan Studio | Perfilado de Cejas, Uñas y Estética en Santa Fe</title>
+    <meta name="description" content="Luan Studio en Santa Fe Capital. Realzamos tu belleza natural con servicios de perfilado de cejas, manicura, pestañas, microbrows, maquillaje y dermolips. ¡Reservá tu turno!" />
+    <meta name="keywords" content="perfilado de cejas en Santa Fe, manicura en Santa Fe, pestañas, microbrows, estética en Santa Fe Capital, Luan Studio, dermolips, maquillaje" />
+    <link rel="icon" type="image/jpeg" href="/images/logoLuan.jpeg" />
+    <link rel="apple-touch-icon" href="/images/logoLuan.jpeg" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Luan Studio | Estética en Santa Fe Capital" />
+    <meta property="og:description" content="Realzamos tu belleza natural. Especialistas en cejas, uñas, pestañas y más en Santa Fe." />
+    <meta property="og:image" content="/image_dd5182.jpg" />
+    <meta property="og:url" content="https://luanstudio.com.ar" />
+
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Luan Studio | Estética en Santa Fe" />
+    <meta name="twitter:description" content="Realzamos tu belleza natural con servicios profesionales de estética en Santa Fe Capital." />
+    <meta name="twitter:image" content="/image_dd5182.jpg" />
+
+    <!-- Datos Estructurados JSON-LD Schema.org (BeautySalon) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BeautySalon",
+      "name": "Luan Studio",
+      "slogan": "Realzamos tu belleza natural ✨",
+      "image": "/image_dd5182.jpg",
+      "logo": "/images/logoLuan.jpeg",
+      "telephone": "+5493424417939",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Santa Fe Capital",
+        "addressRegion": "Santa Fe",
+        "addressCountry": "AR"
+      },
+      "url": "https://luanstudio.com.ar",
+      "priceRange": "$$",
+      "sameAs": [
+        "https://wa.me/5493424417939"
+      ],
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Servicios de Estética",
+        "itemListElement": [
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Lashes (Pestañas)" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Microbrows" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Nails (Uñas)" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Perfilado de Cejas" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Make up (Maquillaje)" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Dermolips" } }
+        ]
+      }
+    }
+    </script>
   </head>
   <body>
-    <div id="root"></div>
+    <!-- 
+      React Mount Point con contenido Pre-renderizado SEO (Fallback).
+      Este contenido HTML dentro de #root será reemplazado por React al cargar la aplicación, 
+      pero sirve para ser indexado por rastreadores SEO que no ejecutan JavaScript (como algunos bots), 
+      mejorando drásticamente el posicionamiento local.
+    -->
+    <div id="root">
+      <header>
+        <img src="/image_dd5182.jpg" alt="Luan Studio - Servicio profesional de perfilado de cejas en Santa Fe" />
+        <h1>Luan Studio | Perfilado de Cejas, Uñas y Estética en Santa Fe Capital</h1>
+        <p>Realzamos tu belleza natural ✨</p>
+        <a href="https://wa.me/5493424417939" aria-label="Reservar turno por WhatsApp en Luan Studio">Reservá tu turno</a>
+      </header>
+
+      <main>
+        <section>
+          <h2>Nuestros Servicios de Estética</h2>
+          
+          <article>
+            <h3>Perfilado de Cejas y Microbrows</h3>
+            <p>Especialistas en perfilado de cejas en Santa Fe. Logramos la forma perfecta para tu rostro utilizando técnicas avanzadas de microbrows.</p>
+          </article>
+          
+          <article>
+            <h3>Manicura y Uñas (Nails)</h3>
+            <p>El mejor servicio de manicura en Santa Fe. Cuidado profesional, esmaltado y diseños exclusivos para tus uñas.</p>
+          </article>
+
+          <article>
+            <h3>Pestañas (Lashes)</h3>
+            <p>Realza tu mirada con nuestro servicio de pestañas postizas, lifting y extensiones de alta calidad.</p>
+          </article>
+
+          <article>
+            <h3>Maquillaje (Make up) y Dermolips</h3>
+            <p>Maquillaje profesional para eventos y tratamientos de Dermolips para unos labios perfectos y naturales.</p>
+          </article>
+        </section>
+
+        <section>
+          <h2>Testimonios de Clientes en Santa Fe Capital</h2>
+          <article>
+            <h3>Atención increíble</h3>
+            <p>"El mejor lugar de estética en Santa Fe Capital. Las chicas son súper profesionales y el perfilado de cejas quedó hermoso."</p>
+          </article>
+        </section>
+      </main>
+
+      <footer>
+        <h2>Contactá a Luan Studio</h2>
+        <p>Ubicados en Santa Fe Capital, Argentina.</p>
+        <a href="https://wa.me/5493424417939" aria-label="Contactar a Luan Studio por WhatsApp">Reservá tu turno</a>
+      </footer>
+    </div>
+    
+    <!-- Script principal de la aplicación React -->
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

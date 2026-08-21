@@ -84,41 +84,28 @@ export default function BookingPage() {
     const { data: profData, isLoading: isLoadingProfs } = useGetPublicProfessionalsQuery();
     const professionals = profData?.data || [];
 
-    const allSpecialties = useMemo(() => {
-        const specs = new Set();
-        professionals.forEach(p => {
-            if (p.specialty && Array.isArray(p.specialty)) {
-                p.specialty.forEach(s => specs.add(s));
-            } else if (p.specialty && typeof p.specialty === 'string') {
-                specs.add(p.specialty);
-            }
-        });
-        if (specs.size === 0) {
-            specs.add('Manicure Clásica');
-            specs.add('Pedicure Spa');
-            specs.add('Nail Art Diseño');
+    // No longer need to aggregate all specialties or filter professionals
+    // The user selects the professional first, then the service from the professional's specialties.
+
+    const selectedSpecialist = professionals.find(p => p.id === selectedSpecialistId);
+    
+    const availableServices = useMemo(() => {
+        if (!selectedSpecialist) return [];
+        let specs = [];
+        if (selectedSpecialist.specialty && Array.isArray(selectedSpecialist.specialty)) {
+            specs = [...selectedSpecialist.specialty];
+        } else if (selectedSpecialist.specialty && typeof selectedSpecialist.specialty === 'string') {
+            specs = [selectedSpecialist.specialty];
         }
-        return Array.from(specs);
-    }, [professionals]);
+        return specs.length > 0 ? specs : ['Manicure Clásica', 'Pedicure Spa', 'Nail Art Diseño'];
+    }, [selectedSpecialist]);
 
     React.useEffect(() => {
-        if (!selectedService && allSpecialties.length > 0) {
-            setSelectedService(allSpecialties[0]);
+        // Auto-select first service when professional changes and a service is not selected or not valid
+        if (availableServices.length > 0 && (!selectedService || !availableServices.includes(selectedService))) {
+            setSelectedService(availableServices[0]);
         }
-    }, [allSpecialties, selectedService]);
-
-    const filteredProfessionals = useMemo(() => {
-        if (!selectedService) return professionals;
-        const filtered = professionals.filter(p => {
-            if (p.specialty && Array.isArray(p.specialty)) {
-                return p.specialty.includes(selectedService);
-            } else if (p.specialty && typeof p.specialty === 'string') {
-                return p.specialty === selectedService;
-            }
-            return true;
-        });
-        return filtered.length > 0 ? filtered : professionals;
-    }, [professionals, selectedService]);
+    }, [availableServices, selectedService]);
 
     const { data: slotsData, isLoading: isLoadingSlots, isFetching: isFetchingSlots } = useGetAvailableSlotsQuery(
         { professional_id: selectedSpecialistId, date: selectedDate?.date, service: selectedService },
@@ -179,8 +166,6 @@ export default function BookingPage() {
             toast({ title: 'Error', description: error?.data?.message || 'Error al confirmar el turno', variant: 'destructive' });
         }
     };
-
-    const selectedSpecialist = professionals.find(p => p.id === selectedSpecialistId);
     const requiresPayment = selectedSpecialist && selectedSpecialist.require_payment && selectedSpecialist.session_fee > 0 && !!selectedSpecialist.mp_access_token;
     const sessionFee = selectedSpecialist?.session_fee || 1500;
     
@@ -213,75 +198,11 @@ export default function BookingPage() {
                     {/* Left Column: Steps 1, 2, 3 */}
                     <div className="lg:col-span-8 space-y-8 md:space-y-10">
                         
-                        {/* STEP 1: Seleccione un Servicio */}
+                        {/* STEP 1: Elija un Especialista */}
                         <div>
                             <div className="flex items-center gap-3 mb-4 md:mb-5">
                                 <div className="w-7 h-7 rounded-full bg-[#3D1A20] text-[#E8DDD3] flex items-center justify-center font-bold text-xs font-serif shadow-sm">
                                     1
-                                </div>
-                                <h2 
-                                    className="text-lg md:text-2xl font-bold text-[#3D1A20]"
-                                    style={{ fontFamily: 'Playfair Display, Georgia, serif' }}
-                                >
-                                    Seleccione un Servicio
-                                </h2>
-                            </div>
-                            
-                            {/* Horizontal Scroll on Mobile / Grid on Desktop */}
-                            <div className="flex sm:grid sm:grid-cols-2 md:grid-cols-3 gap-4 overflow-x-auto pb-4 sm:pb-0 scrollbar-none snap-x">
-                                {allSpecialties.map((spec) => {
-                                    const isSelected = selectedService === spec;
-                                    const imgSrc = serviceImages[spec] || defaultServiceImage;
-
-                                    return (
-                                        <div 
-                                            key={spec}
-                                            onClick={() => { 
-                                                setSelectedService(spec); 
-                                                setSelectedSpecialistId(null); 
-                                                setSelectedTime(null); 
-                                            }}
-                                            className={`min-w-[145px] sm:min-w-0 snap-start flex-1 p-3 md:p-4 rounded-2xl bg-[#FFFDF9] border-2 cursor-pointer transition-all duration-300 relative flex flex-col items-center text-center shadow-sm ${
-                                                isSelected ? 'border-[#3D1A20] ring-1 ring-[#3D1A20]/30 shadow-md' : 'border-[#E8DDD3] hover:border-[#3D1A20]/40'
-                                            }`}
-                                        >
-                                            {/* Photo Box */}
-                                            <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-xl overflow-hidden mb-3 bg-[#E8DDD3] relative shadow-inner">
-                                                <img 
-                                                    src={imgSrc} 
-                                                    alt={spec} 
-                                                    className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
-                                                />
-                                            </div>
-
-                                            {/* Title & Subtitle */}
-                                            <h3 
-                                                className="font-bold text-xs md:text-sm text-[#3D1A20] leading-tight mb-1"
-                                                style={{ fontFamily: 'Playfair Display, Georgia, serif' }}
-                                            >
-                                                {spec}
-                                            </h3>
-                                            <span className="text-[10px] text-[#3D1A20]/60 font-medium">
-                                                {spec.includes('Pedicure') ? 'Cuidado Total' : 'Servicio Base'}
-                                            </span>
-
-                                            {/* Selected Checkmark Badge */}
-                                            {isSelected && (
-                                                <div className="absolute -bottom-1 -right-1 sm:bottom-2 sm:right-2 bg-[#3D1A20] text-[#E8DDD3] w-6 h-6 rounded-full flex items-center justify-center shadow-md border border-[#E8DDD3]">
-                                                    <Check size={14} strokeWidth={3} />
-                                                </div>
-                                            )}
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
-
-                        {/* STEP 2: Elija un Especialista */}
-                        <div>
-                            <div className="flex items-center gap-3 mb-4 md:mb-5">
-                                <div className="w-7 h-7 rounded-full bg-[#3D1A20] text-[#E8DDD3] flex items-center justify-center font-bold text-xs font-serif shadow-sm">
-                                    2
                                 </div>
                                 <h2 
                                     className="text-lg md:text-2xl font-bold text-[#3D1A20]"
@@ -295,11 +216,11 @@ export default function BookingPage() {
                                 <div className="flex items-center gap-2 text-[#3D1A20]/70 py-4 font-medium text-xs md:text-sm">
                                     <Loader2 className="animate-spin" size={18}/> Cargando especialistas...
                                 </div>
-                            ) : filteredProfessionals.length === 0 ? (
-                                <p className="text-[#3D1A20]/60 text-xs italic">No hay especialistas disponibles para este servicio.</p>
+                            ) : professionals.length === 0 ? (
+                                <p className="text-[#3D1A20]/60 text-xs italic">No hay especialistas disponibles en este momento.</p>
                             ) : (
                                 <div className="flex sm:grid sm:grid-cols-3 gap-4 overflow-x-auto pb-4 sm:pb-0 scrollbar-none snap-x">
-                                    {filteredProfessionals.map(prof => {
+                                    {professionals.map(prof => {
                                         const isSelected = selectedSpecialistId === prof.id;
                                         return (
                                             <div 
@@ -332,6 +253,80 @@ export default function BookingPage() {
                                                 </span>
 
                                                 {/* Selected Badge */}
+                                                {isSelected && (
+                                                    <div className="absolute -bottom-1 -right-1 sm:bottom-2 sm:right-2 bg-[#3D1A20] text-[#E8DDD3] w-6 h-6 rounded-full flex items-center justify-center shadow-md border border-[#E8DDD3]">
+                                                        <Check size={14} strokeWidth={3} />
+                                                    </div>
+                                                )}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* STEP 2: Seleccione un Servicio */}
+                        <div className={`transition-all ${!selectedSpecialistId ? 'opacity-50 pointer-events-none' : ''}`}>
+                            <div className="flex items-center gap-3 mb-4 md:mb-5">
+                                <div className="w-7 h-7 rounded-full bg-[#3D1A20] text-[#E8DDD3] flex items-center justify-center font-bold text-xs font-serif shadow-sm">
+                                    2
+                                </div>
+                                <h2 
+                                    className="text-lg md:text-2xl font-bold text-[#3D1A20]"
+                                    style={{ fontFamily: 'Playfair Display, Georgia, serif' }}
+                                >
+                                    Seleccione un Servicio
+                                </h2>
+                            </div>
+                            
+                            {!selectedSpecialistId ? (
+                                <p className="text-[#3D1A20]/60 text-xs italic">Primero seleccione un especialista para ver sus servicios.</p>
+                            ) : (
+                                /* Horizontal Scroll on Mobile / Grid on Desktop */
+                                <div className="flex sm:grid sm:grid-cols-2 md:grid-cols-3 gap-4 overflow-x-auto pb-4 sm:pb-0 scrollbar-none snap-x">
+                                    {availableServices.map((spec, index) => {
+                                        const isSelected = selectedService === spec;
+                                        
+                                        // Use professional's service image if available, else fallback
+                                        let imgSrc = defaultServiceImage;
+                                        if (selectedSpecialist?.service_images && selectedSpecialist.service_images[index]) {
+                                            imgSrc = selectedSpecialist.service_images[index];
+                                        } else if (serviceImages[spec]) {
+                                            imgSrc = serviceImages[spec];
+                                        }
+
+                                        return (
+                                            <div 
+                                                key={spec}
+                                                onClick={() => { 
+                                                    setSelectedService(spec); 
+                                                    setSelectedTime(null); 
+                                                }}
+                                                className={`min-w-[145px] sm:min-w-0 snap-start flex-1 p-3 md:p-4 rounded-2xl bg-[#FFFDF9] border-2 cursor-pointer transition-all duration-300 relative flex flex-col items-center text-center shadow-sm ${
+                                                    isSelected ? 'border-[#3D1A20] ring-1 ring-[#3D1A20]/30 shadow-md' : 'border-[#E8DDD3] hover:border-[#3D1A20]/40'
+                                                }`}
+                                            >
+                                                {/* Photo Box */}
+                                                <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-xl overflow-hidden mb-3 bg-[#E8DDD3] relative shadow-inner">
+                                                    <img 
+                                                        src={imgSrc} 
+                                                        alt={spec} 
+                                                        className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
+                                                    />
+                                                </div>
+
+                                                {/* Title & Subtitle */}
+                                                <h3 
+                                                    className="font-bold text-xs md:text-sm text-[#3D1A20] leading-tight mb-1"
+                                                    style={{ fontFamily: 'Playfair Display, Georgia, serif' }}
+                                                >
+                                                    {spec}
+                                                </h3>
+                                                <span className="text-[10px] text-[#3D1A20]/60 font-medium">
+                                                    {spec.includes('Pedicure') ? 'Cuidado Total' : 'Servicio Base'}
+                                                </span>
+
+                                                {/* Selected Checkmark Badge */}
                                                 {isSelected && (
                                                     <div className="absolute -bottom-1 -right-1 sm:bottom-2 sm:right-2 bg-[#3D1A20] text-[#E8DDD3] w-6 h-6 rounded-full flex items-center justify-center shadow-md border border-[#E8DDD3]">
                                                         <Check size={14} strokeWidth={3} />

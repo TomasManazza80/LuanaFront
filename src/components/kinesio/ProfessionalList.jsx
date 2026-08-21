@@ -77,7 +77,8 @@ const ProfessionalList = () => {
         specialty: [],
         profile_picture: '',
         service_images: [],
-        role: 'ADMIN' // Always creating an ADMIN for now
+        role: 'ADMIN', // Always creating an ADMIN for now
+        is_public: true
     });
     const [searchTerm, setSearchTerm] = useState('');
     const [roleFilter, setRoleFilter] = useState('ALL');
@@ -110,7 +111,7 @@ const ProfessionalList = () => {
                 variant: 'success'
             });
             setIsModalOpen(false);
-            setFormData({ name: '', email: '', password: '', specialty: [], profile_picture: '', role: 'ADMIN' });
+            setFormData({ name: '', email: '', password: '', specialty: [], profile_picture: '', service_images: [], role: 'ADMIN', is_public: true });
         } catch (err) {
             toast({
                 title: 'Error',
@@ -538,6 +539,21 @@ const ProfessionalList = () => {
                                 <div className="mt-2 bg-blue-50 text-blue-800 p-3 rounded-lg text-sm flex gap-2">
                                     <ShieldAlert size={18} className="shrink-0 mt-0.5" />
                                     <p>Este usuario se creará con el rol <strong>ADMIN</strong>, lo que le dará acceso al panel de administración para gestionar su propia agenda y clientes.</p>
+                                </div>
+                                <div className="pt-2 border-t border-gray-200 mt-2 flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm font-bold text-gray-900">Mostrar en web pública</p>
+                                        <p className="text-xs text-gray-500">Permite que los clientes agenden turnos con este profesional</p>
+                                    </div>
+                                    <label className="relative inline-flex items-center cursor-pointer">
+                                        <input 
+                                            type="checkbox" 
+                                            className="sr-only peer"
+                                            checked={formData.is_public !== undefined ? formData.is_public : true}
+                                            onChange={e => setFormData({...formData, is_public: e.target.checked})}
+                                        />
+                                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                                    </label>
                                 </div>
                             </form>
                         </div>

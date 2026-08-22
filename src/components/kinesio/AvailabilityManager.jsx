@@ -79,8 +79,8 @@ const AvailabilityManager = () => {
                 } else {
                     if (!newSchedules[item.day_of_week]) newSchedules[item.day_of_week] = [];
                     newSchedules[item.day_of_week].push({
-                        start_time: item.start_time,
-                        end_time: item.end_time,
+                        start_time: item.start_time ? item.start_time.substring(0, 5) : '',
+                        end_time: item.end_time ? item.end_time.substring(0, 5) : '',
                         session_duration: item.session_duration || 30
                     });
                 }
@@ -112,6 +112,15 @@ const AvailabilityManager = () => {
             daySched[index] = { ...daySched[index], [field]: value };
             return { ...prev, [day]: daySched };
         });
+    };
+
+    const handleTimeInput = (day, index, field, value, nativeEvent) => {
+        let val = value.replace(/[^\d:]/g, '');
+        if (val.length === 2 && !val.includes(':') && nativeEvent?.inputType !== 'deleteContentBackward') {
+            val += ':';
+        }
+        if (val.length > 5) val = val.substring(0, 5);
+        handleTimeChange(day, index, field, val);
     };
 
     const handleSave = async () => {
@@ -220,19 +229,23 @@ const AvailabilityManager = () => {
                                         <div key={index} className="flex items-center gap-2 mt-2">
                                             <div className="flex-1 bg-white border border-gray-200 rounded-lg flex items-center shadow-sm">
                                                 <input
-                                                    type="time"
-                                                    value={block.start_time}
-                                                    onChange={(e) => handleTimeChange(day, index, 'start_time', e.target.value)}
-                                                    className="w-full px-3 py-1.5 text-sm font-semibold text-gray-700 bg-transparent outline-none"
+                                                    type="text"
+                                                    placeholder="09:00"
+                                                    maxLength={5}
+                                                    value={block.start_time ? block.start_time.substring(0, 5) : ''}
+                                                    onChange={(e) => handleTimeInput(day, index, 'start_time', e.target.value, e.nativeEvent)}
+                                                    className="w-full px-3 py-1.5 text-sm font-semibold text-gray-700 bg-transparent outline-none text-center tracking-widest"
                                                 />
                                             </div>
                                             <span className="text-gray-400 font-bold">-</span>
                                             <div className="flex-1 bg-white border border-gray-200 rounded-lg flex items-center shadow-sm">
                                                 <input
-                                                    type="time"
-                                                    value={block.end_time}
-                                                    onChange={(e) => handleTimeChange(day, index, 'end_time', e.target.value)}
-                                                    className="w-full px-3 py-1.5 text-sm font-semibold text-gray-700 bg-transparent outline-none"
+                                                    type="text"
+                                                    placeholder="13:00"
+                                                    maxLength={5}
+                                                    value={block.end_time ? block.end_time.substring(0, 5) : ''}
+                                                    onChange={(e) => handleTimeInput(day, index, 'end_time', e.target.value, e.nativeEvent)}
+                                                    className="w-full px-3 py-1.5 text-sm font-semibold text-gray-700 bg-transparent outline-none text-center tracking-widest"
                                                 />
                                             </div>
                                             <div className="bg-white border border-gray-200 rounded-lg flex items-center shadow-sm px-2 ml-2">

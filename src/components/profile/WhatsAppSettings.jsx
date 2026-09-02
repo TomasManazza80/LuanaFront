@@ -25,7 +25,7 @@ const WhatsAppSettings = ({ profId }) => {
         if (data) {
             setStatus(data.status);
             if (data.profId) {
-                const backendUrl = import.meta.env.VITE_PUBLIC_BACKEND_URL || 'http://localhost:10000';
+                const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:10000';
                 const socket = io(backendUrl);
 
                 socket.on(`whatsapp-status`, (newStatus) => {

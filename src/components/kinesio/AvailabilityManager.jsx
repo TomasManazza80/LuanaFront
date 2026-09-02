@@ -29,7 +29,8 @@ const AvailabilityManager = () => {
 
     useEffect(() => {
         if (profileData?.data && !selectedProfId) {
-            setSelectedProfId(profileData.data.id.toString());
+            const profId = profileData.data.id || profileData.data._id;
+            if (profId) setSelectedProfId(profId.toString());
         }
     }, [profileData, selectedProfId]);
 
@@ -53,7 +54,7 @@ const AvailabilityManager = () => {
     useEffect(() => {
         // Fetch MP Auth URL if token is missing
         if (!mpAccessToken) {
-            const backendUrl = import.meta.env.VITE_PUBLIC_BACKEND_URL || 'http://localhost:10000';
+            const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:10000';
             const token = localStorage.getItem('token');
             if (token) {
                 fetch(`${backendUrl}/api/kinesio/mp-auth-url`, {
@@ -124,6 +125,11 @@ const AvailabilityManager = () => {
     };
 
     const handleSave = async () => {
+        if (!selectedProfId) {
+            toast({ title: 'Error', description: 'Por favor seleccione un profesional primero', variant: 'error' });
+            return;
+        }
+
         const payloadSchedules = [];
         Object.keys(schedules).forEach(day => {
             schedules[day].forEach(block => {

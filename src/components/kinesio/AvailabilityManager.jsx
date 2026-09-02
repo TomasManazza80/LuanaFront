@@ -1,21 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Clock, Plus, CalendarX, X, ChevronLeft, ChevronRight, Trash2, AlertTriangle } from 'lucide-react';
-import { useGetAvailabilityQuery, useSaveAvailabilityMutation, useGetProfileQuery, useUpdateProfileMutation, useGetProfessionalsQuery, useUpdateProfessionalMutation } from '../../services/api/kinesioApi.js';
+import { useGetAvailabilityQuery, useSaveAvailabilityMutation, useGetProfileQuery, useUpdateProfileMutation } from '../../services/api/kinesioApi.js';
 import { toast } from '../ui/use-toast';
 import WhatsAppSettings from '../profile/WhatsAppSettings.jsx';
 
 const DAYS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
 const AvailabilityManager = () => {
-    const [selectedProfId, setSelectedProfId] = useState('');
-    const { data, isLoading } = useGetAvailabilityQuery(selectedProfId || undefined, { skip: !selectedProfId });
-    const [saveAvailability, { isLoading: isSaving }] = useSaveAvailabilityMutation();
-
     const { data: profileData, isLoading: isProfileLoading } = useGetProfileQuery();
+    const myProfId = profileData?.data?.id?.toString() || profileData?.data?._id?.toString() || '';
+
+    const { data, isLoading } = useGetAvailabilityQuery(myProfId || undefined, { skip: !myProfId });
+    const [saveAvailability, { isLoading: isSaving }] = useSaveAvailabilityMutation();
     const [updateProfile, { isLoading: isUpdatingProfile }] = useUpdateProfileMutation();
-    const { data: profData, isLoading: isProfLoading } = useGetProfessionalsQuery();
-    const [updateProfessional] = useUpdateProfessionalMutation();
-    const professionals = profData?.data || [];
 
     // Map day -> array of { start_time, end_time }
     const [schedules, setSchedules] = useState({});
@@ -28,28 +25,13 @@ const AvailabilityManager = () => {
     const [mpAuthUrl, setMpAuthUrl] = useState('');
 
     useEffect(() => {
-        if (profileData?.data && !selectedProfId) {
-            const profId = profileData.data.id || profileData.data._id;
-            if (profId) setSelectedProfId(profId.toString());
+        if (profileData?.data) {
+            const fee = Number(profileData.data.session_fee);
+            setSessionFee(fee === 0 || isNaN(fee) ? '' : fee.toString());
+            setRequirePayment(!!profileData.data.require_payment);
+            setMpAccessToken(profileData.data.mp_access_token || '');
         }
-    }, [profileData, selectedProfId]);
-
-    useEffect(() => {
-        if (selectedProfId && professionals.length > 0) {
-            const prof = professionals.find(p => p.id.toString() === selectedProfId);
-            if (prof) {
-                const fee = Number(prof.session_fee);
-                setSessionFee(fee === 0 || isNaN(fee) ? '' : fee.toString());
-                setRequirePayment(!!prof.require_payment);
-                setMpAccessToken(prof.mp_access_token || '');
-            } else if (profileData?.data && profileData.data.id.toString() === selectedProfId) {
-                const fee = Number(profileData.data.session_fee);
-                setSessionFee(fee === 0 || isNaN(fee) ? '' : fee.toString());
-                setRequirePayment(!!profileData.data.require_payment);
-                setMpAccessToken(profileData.data.mp_access_token || '');
-            }
-        }
-    }, [selectedProfId, professionals, profileData]);
+    }, [profileData]);
 
     useEffect(() => {
         // Fetch MP Auth URL if token is missing
@@ -125,8 +107,8 @@ const AvailabilityManager = () => {
     };
 
     const handleSave = async () => {
-        if (!selectedProfId) {
-            toast({ title: 'Error', description: 'Por favor seleccione un profesional primero', variant: 'error' });
+        if (!myProfId) {
+            toast({ title: 'Error', description: 'No se pudo identificar tu usuario.', variant: 'error' });
             return;
         }
 
@@ -145,18 +127,15 @@ const AvailabilityManager = () => {
         });
 
         try {
-            await saveAvailability({ schedules: payloadSchedules, exceptions, professional_id: selectedProfId }).unwrap();
+            await saveAvailability({ schedules: payloadSchedules, exceptions, professional_id: myProfId }).unwrap();
             
             const feePayload = { 
                 session_fee: sessionFee === '' ? 0 : Number(sessionFee),
                 require_payment: requirePayment
             };
 
-            if (profileData?.data?.id?.toString() === selectedProfId) {
-                await updateProfile(feePayload).unwrap();
-            } else {
-                await updateProfessional({ id: selectedProfId, ...feePayload }).unwrap();
-            }
+            await updateProfile(feePayload).unwrap();
+            
             toast({ title: 'Éxito', description: 'Configuración guardada correctamente', variant: 'success' });
         } catch (error) {
             toast({ title: 'Error', description: 'No se pudo guardar la configuración', variant: 'error' });
@@ -174,20 +153,6 @@ const AvailabilityManager = () => {
                     <h1 className="text-xl md:text-2xl font-bold tracking-tight text-[#111827]">Gestión de Disponibilidad</h1>
                     <p className="text-xs text-gray-500 mt-0.5">Configura tus horarios de atención y días no laborables.</p>
                 </div>
-                {profileData?.data?.role === 'ADMIN' && professionals.length > 0 && (
-                    <div className="w-full md:w-72 relative">
-                        <select
-                            value={selectedProfId}
-                            onChange={(e) => setSelectedProfId(e.target.value)}
-                            className="w-full px-4 py-2 border border-gray-200 rounded-xl outline-none focus:border-[#0A58CA] appearance-none bg-white font-semibold text-gray-700"
-                        >
-                            {professionals.map(prof => (
-                                <option key={prof.id} value={prof.id}>{prof.name || prof.email}</option>
-                            ))}
-                        </select>
-                        <ChevronRight className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none rotate-90" size={18} />
-                    </div>
-                )}
             </div>
 
             <div className="flex flex-col lg:flex-row gap-6">
@@ -328,19 +293,11 @@ const AvailabilityManager = () => {
                             </button>
                             <button 
                                 onClick={() => {
-                                    if (profileData?.data?.id?.toString() === selectedProfId) {
-                                        updateProfile({ mp_access_token: null, mp_refresh_token: null, mp_user_id: null })
-                                        .unwrap().then(() => {
-                                            setMpAccessToken('');
-                                            setShowDisconnectModal(false);
-                                        });
-                                    } else {
-                                        updateProfessional({ id: selectedProfId, mp_access_token: null, mp_refresh_token: null, mp_user_id: null })
-                                        .unwrap().then(() => {
-                                            setMpAccessToken('');
-                                            setShowDisconnectModal(false);
-                                        });
-                                    }
+                                    updateProfile({ mp_access_token: null, mp_refresh_token: null, mp_user_id: null })
+                                    .unwrap().then(() => {
+                                        setMpAccessToken('');
+                                        setShowDisconnectModal(false);
+                                    });
                                 }}
                                 className="flex-1 px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl transition-colors"
                             >

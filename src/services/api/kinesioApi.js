@@ -270,7 +270,7 @@ export const kinesioApi = authApi.injectEndpoints({
         saveWhatsappTemplate: build.mutation({
             query: ({ template, profId }) => ({
                 url: `/api/whatsapp/template`,
-                method: 'PUT',
+                method: 'POST',
                 body: { template, prof_id: profId }
             }),
             invalidatesTags: ['WhatsApp']

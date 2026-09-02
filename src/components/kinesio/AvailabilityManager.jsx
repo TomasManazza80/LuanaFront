@@ -272,7 +272,7 @@ const AvailabilityManager = () => {
                         </ul>
                     </div>
                     
-                    <WhatsAppSettings />
+                    <WhatsAppSettings profId={myProfId} />
                 </div>
 
             </div>

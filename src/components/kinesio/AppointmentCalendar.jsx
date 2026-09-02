@@ -1,17 +1,22 @@
 import React, { useState } from 'react';
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { Filter, CalendarDays, Download, Search, HeadphonesIcon, LayoutGrid, ChevronLeft, ChevronRight, X, Check, List, History } from "lucide-react";
+import { Filter, CalendarDays, Download, Search, HeadphonesIcon, LayoutGrid, ChevronLeft, ChevronRight, X, Check, List, History, MessageCircle, Trash2, Settings } from "lucide-react";
 import {
     useGetProfessionalsQuery,
+    useGetProfileQuery,
+    useUpdateProfileMutation,
     useGetAppointmentsQuery,
     useGetPatientsQuery,
     useCreateAppointmentMutation,
     useUpdateAppointmentMutation,
+    useDeleteAppointmentMutation,
     useCreatePatientMutation,
-    useGetAvailabilityQuery
+    useGetAvailabilityQuery,
+    useSendWhatsappMessageMutation
 } from '../../services/api/kinesioApi.js';
 import { toast } from '../ui/use-toast';
+import { LiaCloneSolid } from 'react-icons/lia';
 
 // Date Helpers
 const getStartOfWeek = (date) => {
@@ -23,9 +28,21 @@ const getStartOfWeek = (date) => {
     return d;
 };
 
+// Robust date parser to handle UTC properly even if backend drops the 'Z'
+const parseDateString = (dateStr) => {
+    if (!dateStr) return new Date();
+    let d = dateStr;
+    if (d.includes(' ')) d = d.replace(' ', 'T');
+    if (!d.endsWith('Z') && !d.match(/[+-]\d{2}:?\d{2}$/)) {
+        d += 'Z';
+    }
+    return new Date(d);
+};
+
 const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
 
 const AppointmentCalendar = () => {
+
     const user = useSelector(state => state.authSlice.userInfo);
     const navigate = useNavigate();
     const [selectedProfessional, setSelectedProfessional] = useState(null);
@@ -38,9 +55,16 @@ const AppointmentCalendar = () => {
     // Modal State
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isListModalOpen, setIsListModalOpen] = useState(false);
-    const [newAppt, setNewAppt] = useState({ patient_id: '', fecha_hora: '', end_time: '', motivo: '' });
+    const [newAppt, setNewAppt] = useState({ patient_id: '', fecha_hora: '', duration: 30, motivo: '' });
     const [isCreatingPatient, setIsCreatingPatient] = useState(false);
     const [newPatientName, setNewPatientName] = useState('');
+
+    const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
+    const [configData, setConfigData] = useState({
+        whatsapp_reminder_minutes: 60,
+        whatsapp_creation_template: 'Hola {{patient_name}}, tu turno para {{service}} ha sido reservado para el día {{date}} a las {{time}} hs.',
+        whatsapp_reminder_template: 'Hola {{patient_name}}, te recordamos tu turno de {{service}} para hoy a las {{time}} hs.'
+    });
 
     const [viewMode, setViewMode] = useState('Semanal');
     const [isCompact, setIsCompact] = useState(false);
@@ -53,12 +77,28 @@ const AppointmentCalendar = () => {
     const professionals = professionalsData?.data || [];
     const activeProfessionalId = (['ADMIN', 'EMPLOYEE'].includes(user?.role) && selectedProfessional) ? selectedProfessional : user?.id;
 
+    const { data: profileData } = useGetProfileQuery(undefined, { skip: !user });
+    const [updateProfile, { isLoading: isUpdatingProfile }] = useUpdateProfileMutation();
+
+    // Effect to load config when modal opens or profile changes
+    React.useEffect(() => {
+        if (profileData?.data) {
+            setConfigData({
+                whatsapp_reminder_minutes: profileData.data.whatsapp_reminder_minutes || 60,
+                whatsapp_creation_template: profileData.data.whatsapp_creation_template || 'Hola {{patient_name}}, tu turno para {{service}} ha sido reservado para el día {{date}} a las {{time}} hs.',
+                whatsapp_reminder_template: profileData.data.whatsapp_reminder_template || 'Hola {{patient_name}}, te recordamos tu turno de {{service}} para hoy a las {{time}} hs.'
+            });
+        }
+    }, [profileData]);
+
     const { data: patientsData } = useGetPatientsQuery();
     const patients = patientsData || [];
 
     const [createAppointment, { isLoading: isCreating }] = useCreateAppointmentMutation();
     const [updateAppointment] = useUpdateAppointmentMutation();
+    const [deleteAppointment] = useDeleteAppointmentMutation();
     const [createPatient, { isLoading: isCreatingPatientLoading }] = useCreatePatientMutation();
+    const [sendWhatsappMessage] = useSendWhatsappMessageMutation();
 
     const handleCompleteAppointment = async (id) => {
         try {
@@ -69,6 +109,61 @@ const AppointmentCalendar = () => {
             toast({ title: 'Error', description: 'No se pudo actualizar el turno', variant: 'destructive' });
         }
     };
+
+    const handleCancelAppointment = async (id) => {
+        if (!window.confirm('¿Estás seguro de que deseas cancelar este turno?')) return;
+        try {
+            await updateAppointment({ id, estado: 'cancelado' }).unwrap();
+            toast({ title: 'Éxito', description: 'Turno cancelado correctamente' });
+            setSelectedApptDetail(null);
+            if (isListModalOpen) setIsListModalOpen(false);
+        } catch (err) {
+            console.error(err);
+            toast({ title: 'Error', description: 'No se pudo cancelar el turno', variant: 'destructive' });
+        }
+    };
+
+    const handleSendReminder = async (appt) => {
+        const phone = appt.patient?.datos_contacto?.telefono || appt.patient?.datos_contacto?.phone;
+        if (!phone) {
+            toast({ title: 'Aviso', description: 'El paciente no tiene teléfono registrado.', variant: 'destructive' });
+            return;
+        }
+        
+        const date = parseDateString(appt.fecha_hora);
+        const dateString = date.toLocaleDateString();
+        const timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const message = `Hola ${appt.patient?.nombre || ''}, te recordamos tu turno para el día ${dateString} a las ${timeString}. ¡Te esperamos!`;
+        
+        let phoneNumber = phone.replace(/\D/g, '');
+        if (!phoneNumber.startsWith('54') && phoneNumber.length === 10) {
+            phoneNumber = '549' + phoneNumber;
+        }
+        
+        try {
+            await sendWhatsappMessage({ phone: phoneNumber, message }).unwrap();
+            toast({ title: 'Éxito', description: 'Recordatorio manual de WhatsApp enviado.' });
+        } catch (error) {
+            console.error('Error enviando WhatsApp:', error);
+            if (error.data?.code === 'WHATSAPP_NOT_CONNECTED') {
+                toast({ title: 'Error', description: 'WhatsApp no está conectado. Por favor, escanea el QR en la configuración.', variant: 'destructive' });
+            } else {
+                toast({ title: 'Error', description: 'No se pudo enviar el recordatorio por WhatsApp.', variant: 'destructive' });
+            }
+        }
+    };
+
+    const handleSaveConfig = async (e) => {
+        e.preventDefault();
+        try {
+            await updateProfile(configData).unwrap();
+            toast({ title: 'Éxito', description: 'Configuración guardada correctamente.' });
+            setIsConfigModalOpen(false);
+        } catch (error) {
+            toast({ title: 'Error', description: 'No se pudo guardar la configuración.', variant: 'destructive' });
+        }
+    };
+
 
     const startOfWeek = getStartOfWeek(currentDate);
     const endOfWeek = new Date(startOfWeek);
@@ -95,6 +190,7 @@ const AppointmentCalendar = () => {
     if (appointments && Array.isArray(appointments)) {
         appointments.forEach(appt => {
             if (!appt.fecha_hora) return;
+            if (appt.estado === 'cancelado') return;
 
             // Filters
             if (statusFilter && appt.estado !== statusFilter) return;
@@ -103,7 +199,7 @@ const AppointmentCalendar = () => {
                 if (!patientName.includes(searchQuery.toLowerCase())) return;
             }
 
-            const date = new Date(appt.fecha_hora);
+            const date = parseDateString(appt.fecha_hora);
 
             if (viewMode === 'Semanal') {
                 const dayOfWeek = date.getDay();
@@ -179,15 +275,19 @@ const AppointmentCalendar = () => {
     const handleCreateAppointment = async (e) => {
         e.preventDefault();
         try {
+            const startDate = new Date(newAppt.fecha_hora);
+            const endDate = new Date(startDate);
+            endDate.setMinutes(endDate.getMinutes() + Number(newAppt.duration));
+
             await createAppointment({
                 patient_id: newAppt.patient_id,
                 professional_id: activeProfessionalId,
-                fecha_hora: newAppt.fecha_hora,
-                end_time: newAppt.end_time || null,
+                fecha_hora: startDate.toISOString(),
+                end_time: endDate.toISOString(),
                 motivo: newAppt.motivo
             }).unwrap();
             setIsModalOpen(false);
-            setNewAppt({ patient_id: '', fecha_hora: '', end_time: '', motivo: '' });
+            setNewAppt({ patient_id: '', fecha_hora: '', duration: 30, motivo: '' });
         } catch (err) {
             console.error("Failed to create appointment", err);
             toast({ title: 'Error', description: 'Error al crear el turno', variant: 'destructive' });
@@ -195,7 +295,7 @@ const AppointmentCalendar = () => {
     };
 
     const renderAppointment = (appt) => {
-        const date = new Date(appt.fecha_hora);
+        const date = parseDateString(appt.fecha_hora);
         const hours = date.getHours();
         const minutes = date.getMinutes();
 
@@ -206,7 +306,7 @@ const AppointmentCalendar = () => {
 
         let height = hourHeight;
         if (appt.end_time) {
-            const endDate = new Date(appt.end_time);
+            const endDate = parseDateString(appt.end_time);
             const durationMinutes = (endDate - date) / (1000 * 60);
             if (durationMinutes > 15) height = (durationMinutes / 60) * hourHeight;
         }
@@ -234,7 +334,7 @@ const AppointmentCalendar = () => {
                 }}>
                 <div className="flex justify-between items-start">
                     <div className="text-sm font-bold truncate" style={{ color: color.text }}>{appt.motivo || 'Turno'}</div>
-                    <button 
+                    <button
                         onClick={(e) => { e.stopPropagation(); handleCompleteAppointment(appt.id); }}
                         className={`p-1 rounded-full transition-colors ${appt.estado === 'completado' ? 'text-green-600 bg-green-100' : 'text-gray-400 hover:text-green-600 hover:bg-white/50'}`}
                         title="Marcar como completado"
@@ -289,6 +389,12 @@ const AppointmentCalendar = () => {
                         className="flex items-center gap-1.5 px-3 py-1.5 bg-[#0A58CA] border border-blue-600 rounded-full text-xs font-medium text-white hover:bg-blue-700 transition-colors shadow-sm"
                     >
                         <History size={14} /> Historial Turnos
+                    </button>
+                    <button
+                        onClick={() => setIsConfigModalOpen(true)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-800 border border-gray-900 rounded-full text-xs font-medium text-white hover:bg-gray-900 transition-colors shadow-sm"
+                    >
+                        <Settings size={14} /> Configuración de Turnos
                     </button>
                 </div>
                 <div className="flex flex-wrap items-center gap-2 relative">
@@ -536,13 +642,19 @@ const AppointmentCalendar = () => {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-1">Fin</label>
-                                    <input
-                                        type="datetime-local"
-                                        className="w-full border border-gray-200 rounded-lg p-2 text-sm focus:outline-none focus:border-blue-500"
-                                        value={newAppt.end_time}
-                                        onChange={(e) => setNewAppt({ ...newAppt, end_time: e.target.value })}
-                                    />
+                                    <label className="block text-sm font-semibold text-gray-700 mb-1">Duración</label>
+                                    <select
+                                        className="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:outline-none focus:border-blue-500 bg-white"
+                                        value={newAppt.duration}
+                                        onChange={(e) => setNewAppt({ ...newAppt, duration: e.target.value })}
+                                    >
+                                        <option value={15}>15 minutos</option>
+                                        <option value={30}>30 minutos</option>
+                                        <option value={45}>45 minutos</option>
+                                        <option value={60}>1 hora</option>
+                                        <option value={90}>1 hora y media</option>
+                                        <option value={120}>2 horas</option>
+                                    </select>
                                 </div>
                             </div>
                             <div>
@@ -598,27 +710,43 @@ const AppointmentCalendar = () => {
                                 <div>
                                     <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Inicio</p>
                                     <p className="text-sm font-medium text-gray-800">
-                                        {new Date(selectedApptDetail.fecha_hora).toLocaleString()}
+                                        {parseDateString(selectedApptDetail.fecha_hora).toLocaleString()}
                                     </p>
                                 </div>
                                 {selectedApptDetail.end_time && (
                                     <div>
                                         <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Fin</p>
                                         <p className="text-sm font-medium text-gray-800">
-                                            {new Date(selectedApptDetail.end_time).toLocaleString()}
+                                            {parseDateString(selectedApptDetail.end_time).toLocaleString()}
                                         </p>
                                     </div>
                                 )}
                             </div>
 
                             {selectedApptDetail.patient && (
-                                <div className="mt-4 pt-4 border-t border-gray-100">
+                                <div className="mt-4 pt-4 border-t border-gray-100 flex flex-col gap-2">
                                     <button
-                                        onClick={() => navigate(`/historial/${selectedApptDetail.patient.id}`)}
-                                        className="w-full bg-[#0A58CA] hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg font-bold shadow-sm transition-colors text-sm flex items-center justify-center gap-2"
+                                        onClick={() => handleSendReminder(selectedApptDetail)}
+                                        className="w-full bg-[#25D366] hover:bg-green-600 text-white px-4 py-2.5 rounded-lg font-bold shadow-sm transition-colors text-sm flex items-center justify-center gap-2"
                                     >
-                                        Ver Perfil / Historial
+                                        <MessageCircle size={16} /> Recordatorio WhatsApp
                                     </button>
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={() => navigate(`/historial/${selectedApptDetail.patient.id}`)}
+                                            className="flex-1 bg-[#0A58CA] hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg font-bold shadow-sm transition-colors text-sm flex items-center justify-center gap-2"
+                                        >
+                                            Ver Perfil
+                                        </button>
+                                        {['ADMIN', 'EMPLOYEE'].includes(user?.role) && (
+                                            <button
+                                                onClick={() => handleCancelAppointment(selectedApptDetail.id)}
+                                                className="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2.5 rounded-lg font-bold shadow-sm transition-colors text-sm flex items-center justify-center gap-2 border border-red-200"
+                                            >
+                                                <Trash2 size={16} /> Cancelar Turno
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
                             )}
                         </div>
@@ -636,21 +764,21 @@ const AppointmentCalendar = () => {
                         </div>
                         <div className="p-4 overflow-y-auto flex-1 flex flex-col gap-3">
                             {(() => {
-                                const dayAppts = appointments ? appointments.filter(a => new Date(a.fecha_hora).toDateString() === currentDate.toDateString()) : [];
+                                const dayAppts = appointments ? appointments.filter(a => parseDateString(a.fecha_hora).toDateString() === currentDate.toDateString()) : [];
                                 if (dayAppts.length === 0) {
                                     return <p className="text-sm text-gray-500 text-center py-4">No hay turnos para este día.</p>;
                                 }
-                                return dayAppts.sort((a,b) => new Date(a.fecha_hora) - new Date(b.fecha_hora)).map(appt => (
+                                return dayAppts.sort((a, b) => parseDateString(a.fecha_hora) - parseDateString(b.fecha_hora)).map(appt => (
                                     <div key={appt.id} className="flex justify-between items-center p-3 border border-gray-100 rounded-lg hover:bg-gray-50 cursor-pointer" onClick={() => { setSelectedApptDetail(appt); setIsListModalOpen(false); }}>
                                         <div>
                                             <p className="text-sm font-bold text-gray-900">{appt.patient?.nombre || 'Sin nombre'}</p>
-                                            <p className="text-xs text-gray-500">{new Date(appt.fecha_hora).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {appt.motivo}</p>
+                                            <p className="text-xs text-gray-500">{parseDateString(appt.fecha_hora).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {appt.motivo}</p>
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <span className={`text-xs px-2 py-1 rounded-full ${appt.estado === 'completado' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>
                                                 {appt.estado || 'Confirmado'}
                                             </span>
-                                            <button 
+                                            <button
                                                 onClick={(e) => { e.stopPropagation(); handleCompleteAppointment(appt.id); }}
                                                 className={`p-1.5 rounded-full transition-colors ${appt.estado === 'completado' ? 'text-green-600 bg-green-100' : 'text-gray-400 hover:text-green-600 hover:bg-gray-100'}`}
                                                 title="Marcar como completado"
@@ -662,6 +790,77 @@ const AppointmentCalendar = () => {
                                 ));
                             })()}
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Modal Configuración de Turnos */}
+            {isConfigModalOpen && (
+                <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+                    <div className="bg-white rounded-2xl shadow-xl w-[500px] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                        <div className="flex justify-between items-center p-4 border-b border-gray-100">
+                            <h3 className="font-bold text-lg text-gray-900 flex items-center gap-2"><Settings size={18} /> Configuración de Turnos</h3>
+                            <button onClick={() => setIsConfigModalOpen(false)} className="text-gray-400 hover:text-gray-600"><X size={20} /></button>
+                        </div>
+                        <form onSubmit={handleSaveConfig} className="p-4 flex flex-col gap-4 max-h-[70vh] overflow-y-auto">
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-700 mb-1">Anticipación del Recordatorio (Automático)</label>
+                                <p className="text-xs text-gray-500 mb-2">Selecciona cuánto tiempo antes del turno deseas enviar el recordatorio automático por WhatsApp.</p>
+                                <select
+                                    className="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:outline-none focus:border-blue-500"
+                                    value={configData.whatsapp_reminder_minutes}
+                                    onChange={(e) => setConfigData({ ...configData, whatsapp_reminder_minutes: parseInt(e.target.value) })}
+                                >
+                                    <option value={15}>15 minutos antes</option>
+                                    <option value={30}>30 minutos antes</option>
+                                    <option value={60}>1 hora antes</option>
+                                    <option value={120}>2 horas antes</option>
+                                    <option value={1440}>24 horas antes (1 día)</option>
+                                    <option value={2880}>48 horas antes (2 días)</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-700 mb-1">Mensaje al Crear Turno</label>
+                                <p className="text-xs text-gray-500 mb-2">Este mensaje se envía inmediatamente al reservar un nuevo turno. Puedes usar variables como: {'{{patient_name}}, {{service}}, {{date}}, {{time}}'}</p>
+                                <textarea
+                                    required
+                                    rows={4}
+                                    className="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:outline-none focus:border-blue-500 resize-none"
+                                    value={configData.whatsapp_creation_template}
+                                    onChange={(e) => setConfigData({ ...configData, whatsapp_creation_template: e.target.value })}
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-700 mb-1">Mensaje de Recordatorio (Automático y Manual)</label>
+                                <p className="text-xs text-gray-500 mb-2">Este mensaje se envía automáticamente antes del turno, o cuando presionas "Recordatorio WhatsApp". Variables: {'{{patient_name}}, {{service}}, {{date}}, {{time}}'}</p>
+                                <textarea
+                                    required
+                                    rows={4}
+                                    className="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:outline-none focus:border-blue-500 resize-none"
+                                    value={configData.whatsapp_reminder_template}
+                                    onChange={(e) => setConfigData({ ...configData, whatsapp_reminder_template: e.target.value })}
+                                />
+                            </div>
+
+                            <div className="mt-4 flex justify-end gap-2 border-t border-gray-100 pt-4">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsConfigModalOpen(false)}
+                                    className="px-4 py-2 text-gray-600 font-semibold hover:bg-gray-100 rounded-lg text-sm"
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={isUpdatingProfile}
+                                    className="px-4 py-2 bg-[#0A58CA] hover:bg-blue-700 text-white font-semibold rounded-lg disabled:opacity-50 text-sm shadow-sm"
+                                >
+                                    {isUpdatingProfile ? 'Guardando...' : 'Guardar Configuración'}
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             )}

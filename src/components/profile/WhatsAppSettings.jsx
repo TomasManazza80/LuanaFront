@@ -28,12 +28,12 @@ const WhatsAppSettings = ({ profId }) => {
                 const backendUrl = import.meta.env.VITE_PUBLIC_BACKEND_URL || 'http://localhost:10000';
                 const socket = io(backendUrl);
 
-                socket.on(`status-${data.profId}`, (newStatus) => {
+                socket.on(`whatsapp-status`, (newStatus) => {
                     setStatus(newStatus);
                     if (newStatus === 'connected') setQr(null);
                 });
 
-                socket.on(`qr-${data.profId}`, (newQr) => {
+                socket.on(`whatsapp-qr`, (newQr) => {
                     setQr(newQr);
                 });
 
@@ -115,7 +115,7 @@ const WhatsAppSettings = ({ profId }) => {
                                 <LogOut size={18} /> {isDisconnecting ? 'Desconectando...' : 'Desconectar Cuenta'}
                             </button>
                         </>
-                    ) : status === 'initializing' || status === 'qr_ready' ? (
+                    ) : status === 'initializing' || status === 'qr_ready' || status === 'qr' ? (
                         <>
                             <div className="mb-4 text-blue-600">
                                 <QrCode size={40} className="mx-auto mb-2 opacity-50" />

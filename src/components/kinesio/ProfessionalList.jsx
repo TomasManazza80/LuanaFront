@@ -34,7 +34,10 @@ const ProfessionalList = () => {
     const inputRef = React.useRef(null);
 
     const handleAddSpecialty = async (e) => {
-        e.preventDefault();
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
         if (!newSpecialtyName) return;
         try {
             await createSpecialtyMutation({ name: newSpecialtyName }).unwrap();
@@ -502,13 +505,18 @@ const ProfessionalList = () => {
                                             <>
                                                 {menu}
                                                 <Divider style={{ margin: '8px 0' }} />
-                                                <div className="flex px-2 pb-2 gap-2">
+                                                <div className="flex px-2 pb-2 gap-2" onMouseDown={(e) => e.preventDefault()}>
                                                     <Input
                                                         placeholder="Nueva especialidad"
                                                         ref={inputRef}
                                                         value={newSpecialtyName}
                                                         onChange={(e) => setNewSpecialtyName(e.target.value)}
-                                                        onKeyDown={(e) => e.stopPropagation()}
+                                                        onKeyDown={(e) => {
+                                                            e.stopPropagation();
+                                                            if (e.key === 'Enter') {
+                                                                handleAddSpecialty(e);
+                                                            }
+                                                        }}
                                                     />
                                                     <Button type="text" icon={<Plus size={16} />} onClick={handleAddSpecialty} className="flex items-center text-blue-600 hover:text-blue-800">
                                                         Añadir
@@ -650,13 +658,18 @@ const ProfessionalList = () => {
                                                 <>
                                                     {menu}
                                                     <Divider style={{ margin: '8px 0' }} />
-                                                    <div className="flex px-2 pb-2 gap-2">
+                                                    <div className="flex px-2 pb-2 gap-2" onMouseDown={(e) => e.preventDefault()}>
                                                         <Input
                                                             placeholder="Nueva especialidad"
                                                             ref={inputRef}
                                                             value={newSpecialtyName}
                                                             onChange={(e) => setNewSpecialtyName(e.target.value)}
-                                                            onKeyDown={(e) => e.stopPropagation()}
+                                                            onKeyDown={(e) => {
+                                                                e.stopPropagation();
+                                                                if (e.key === 'Enter') {
+                                                                    handleAddSpecialty(e);
+                                                                }
+                                                            }}
                                                         />
                                                         <Button type="text" icon={<Plus size={16} />} onClick={handleAddSpecialty} className="flex items-center text-blue-600 hover:text-blue-800">
                                                             Añadir

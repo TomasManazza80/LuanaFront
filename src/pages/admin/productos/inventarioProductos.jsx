@@ -156,8 +156,8 @@ export const FormularioEditarModal = ({ producto, onClose, onSave, proveedores, 
           uploadedUrls.push({
             url: fileData.secure_url,
             nombre: file.name,
-            tipo: fileData.resource_type === 'image' ? 'imagen' : 
-                  fileData.resource_type === 'video' ? 'video' : 'documento'
+            tipo: fileData.resource_type === 'image' ? 'imagen' :
+              fileData.resource_type === 'video' ? 'video' : 'documento'
           });
         }
       }
@@ -219,12 +219,12 @@ export const FormularioEditarModal = ({ producto, onClose, onSave, proveedores, 
 
   const handleToggleSpeakingActivity = (activityId) => {
     setEditado(prev => {
-        const current = prev.speakingActivities || [];
-        if (current.includes(activityId)) {
-            return { ...prev, speakingActivities: current.filter(id => id !== activityId) };
-        } else {
-            return { ...prev, speakingActivities: [...current, activityId] };
-        }
+      const current = prev.speakingActivities || [];
+      if (current.includes(activityId)) {
+        return { ...prev, speakingActivities: current.filter(id => id !== activityId) };
+      } else {
+        return { ...prev, speakingActivities: [...current, activityId] };
+      }
     });
   };
 
@@ -237,16 +237,16 @@ export const FormularioEditarModal = ({ producto, onClose, onSave, proveedores, 
         description: 'Actividad creada desde el inventario de productos.',
         assigned_date: new Date().toISOString().split('T')[0]
       });
-      
+
       // Llamar a la función del padre para recargar la lista
       if (fetchPronunciationActivities) {
-         await fetchPronunciationActivities();
+        await fetchPronunciationActivities();
       }
-      
+
       // Auto-seleccionar la recién creada
       setEditado(prev => ({
-          ...prev,
-          speakingActivities: [...(prev.speakingActivities || []), res.data.id]
+        ...prev,
+        speakingActivities: [...(prev.speakingActivities || []), res.data.id]
       }));
       setNewActivityTitle('');
     } catch (error) {
@@ -267,9 +267,9 @@ export const FormularioEditarModal = ({ producto, onClose, onSave, proveedores, 
         className={`${styles.card} w-full max-w-5xl overflow-hidden flex flex-col max-h-[90vh] bg-white p-0`}
       >
         {managingActivity && (
-          <ActivityManagerModal 
-            activity={managingActivity} 
-            onClose={() => setManagingActivity(null)} 
+          <ActivityManagerModal
+            activity={managingActivity}
+            onClose={() => setManagingActivity(null)}
             onUpdate={fetchPronunciationActivities}
           />
         )}
@@ -285,120 +285,120 @@ export const FormularioEditarModal = ({ producto, onClose, onSave, proveedores, 
         <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-8">
 
           {/* CONTENIDO DEL CURSO */}
-            <section className="bg-purple-50 p-6 rounded-2xl border border-purple-200">
-              <label className={`${styles.label} text-purple-700`}>Contenido del Curso (Módulos, PDFs, Videos)</label>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {editado.archivosInfoproducto?.map((archivo, idx) => (
-                  <div key={idx} className="relative p-4 bg-white border border-purple-100 rounded-xl flex flex-col items-center gap-2 group hover:shadow-md transition-all text-center">
-                    {archivo.tipo === 'video' ? <FiVideo size={32} className="text-purple-600" /> : <FiFile size={32} className="text-purple-600" />}
-                    <span className="text-[10px] font-bold text-gray-700 truncate w-full" title={archivo.nombre}>{archivo.nombre || `Archivo ${idx + 1}`}</span>
-                    <a href={archivo.url} target="_blank" rel="noreferrer" className="text-[9px] text-purple-500 hover:underline">Ver Original</a>
-                    <button type="button" onClick={() => handleRemoveCourseFile(idx)} className="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-sm">
-                      <FiX size={12} />
-                    </button>
-                  </div>
-                ))}
-                
-                <label className="flex flex-col items-center justify-center border-2 border-dashed border-purple-300 rounded-xl hover:border-purple-600 hover:bg-white cursor-pointer transition-all text-purple-500 hover:text-purple-600 p-4 aspect-square">
-                  <FiPlus size={24} />
-                  <span className="text-[10px] font-bold uppercase mt-2 text-center">AÑADIR CONTENIDO</span>
-                  <input type="file" multiple onChange={handleAddCourseFiles} className="hidden" />
-                </label>
-              </div>
-            </section>
+          <section className="bg-purple-50 p-6 rounded-2xl border border-purple-200">
+            <label className={`${styles.label} text-purple-700`}>Contenido del Curso (Módulos, PDFs, Videos)</label>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {editado.archivosInfoproducto?.map((archivo, idx) => (
+                <div key={idx} className="relative p-4 bg-white border border-purple-100 rounded-xl flex flex-col items-center gap-2 group hover:shadow-md transition-all text-center">
+                  {archivo.tipo === 'video' ? <FiVideo size={32} className="text-purple-600" /> : <FiFile size={32} className="text-purple-600" />}
+                  <span className="text-[10px] font-bold text-gray-700 truncate w-full" title={archivo.nombre}>{archivo.nombre || `Archivo ${idx + 1}`}</span>
+                  <a href={archivo.url} target="_blank" rel="noreferrer" className="text-[9px] text-purple-500 hover:underline">Ver Original</a>
+                  <button type="button" onClick={() => handleRemoveCourseFile(idx)} className="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-sm">
+                    <FiX size={12} />
+                  </button>
+                </div>
+              ))}
+
+              <label className="flex flex-col items-center justify-center border-2 border-dashed border-purple-300 rounded-xl hover:border-purple-600 hover:bg-white cursor-pointer transition-all text-purple-500 hover:text-purple-600 p-4 aspect-square">
+                <FiPlus size={24} />
+                <span className="text-[10px] font-bold uppercase mt-2 text-center">AÑADIR CONTENIDO</span>
+                <input type="file" multiple onChange={handleAddCourseFiles} className="hidden" />
+              </label>
+            </div>
+          </section>
 
           {/* ACTIVIDADES DE SPEAKING */}
-            <section className="bg-blue-50 p-4 sm:p-6 rounded-2xl border border-blue-200">
-              {/* TABS DE SELECCIÓN */}
-              <div className="flex gap-4 mb-6 border-b border-gray-200 overflow-x-auto no-scrollbar">
-                  <button 
-                      type="button" 
-                      onClick={() => setActivityTab('select')} 
-                      className={`pb-3 text-xs font-bold uppercase transition-all whitespace-nowrap ${activityTab === 'select' ? 'text-black border-b-2 border-black' : 'text-gray-400 hover:text-black'}`}
-                  >
-                      Seleccionar Registros Pasados
-                  </button>
-                  <button 
-                      type="button" 
-                      onClick={() => setActivityTab('create')} 
-                      className={`pb-3 text-xs font-bold uppercase transition-all whitespace-nowrap ${activityTab === 'create' ? 'text-black border-b-2 border-black' : 'text-gray-400 hover:text-black'}`}
-                  >
-                      Crear Nueva Actividad / Tareas
-                  </button>
-              </div>
+          <section className="bg-blue-50 p-4 sm:p-6 rounded-2xl border border-blue-200">
+            {/* TABS DE SELECCIÓN */}
+            <div className="flex gap-4 mb-6 border-b border-gray-200 overflow-x-auto no-scrollbar">
+              <button
+                type="button"
+                onClick={() => setActivityTab('select')}
+                className={`pb-3 text-xs font-bold uppercase transition-all whitespace-nowrap ${activityTab === 'select' ? 'text-black border-b-2 border-black' : 'text-gray-400 hover:text-black'}`}
+              >
+                Seleccionar Registros Pasados
+              </button>
+              <button
+                type="button"
+                onClick={() => setActivityTab('create')}
+                className={`pb-3 text-xs font-bold uppercase transition-all whitespace-nowrap ${activityTab === 'create' ? 'text-black border-b-2 border-black' : 'text-gray-400 hover:text-black'}`}
+              >
+                Crear Nueva Actividad / Tareas
+              </button>
+            </div>
 
-              {/* CONTENIDO DE TABS */}
-              {activityTab === 'select' && (
-                  <div className="animate-fade-in">
-                      <label className={`${styles.label} text-blue-700`}>BUSCAR Y SELECCIONAR ACTIVIDADES DE PRONUNCIACIÓN</label>
-                      <input 
-                          type="text" 
-                          placeholder="BUSCAR ACTIVIDAD..." 
-                          value={activitySearchTerm} 
-                          onChange={(e) => setActivitySearchTerm(e.target.value)} 
-                          className={`${styles.input} mb-4 py-2 text-xs`}
-                      />
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[300px] overflow-y-auto pr-2 no-scrollbar">
-                          {pronunciationActivities && pronunciationActivities
-                              .filter(act => act.title.toLowerCase().includes(activitySearchTerm.toLowerCase()))
-                              .map(act => (
-                              <div key={act.id} className="flex flex-col sm:flex-row sm:items-center gap-3 bg-white p-3 rounded-xl border border-blue-100 shadow-sm cursor-pointer" onClick={() => handleToggleSpeakingActivity(act.id)}>
-                                  <div className="flex items-center gap-3">
-                                      <input 
-                                          type="checkbox" 
-                                          checked={(editado.speakingActivities || []).includes(act.id)} 
-                                          readOnly
-                                          className="w-5 h-5 accent-black cursor-pointer flex-shrink-0"
-                                      />
-                                      <div className="flex flex-col flex-1">
-                                          <span className="text-black font-bold text-sm leading-tight">{act.title}</span>
-                                          <span className="text-gray-500 text-[10px] mt-1">{act.PronunciationTasks?.length || 0} Tareas</span>
-                                      </div>
-                                  </div>
-                                  <button 
-                                      type="button" 
-                                      onClick={(e) => { e.stopPropagation(); setManagingActivity(act); }}
-                                      className="bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg p-2 transition-colors sm:ml-auto text-xs font-bold w-full sm:w-auto text-center mt-2 sm:mt-0"
-                                      title="Gestionar Tareas"
-                                  >
-                                      TAREAS
-                                  </button>
-                              </div>
-                          ))}
-                          {(!pronunciationActivities || pronunciationActivities.filter(act => act.title.toLowerCase().includes(activitySearchTerm.toLowerCase())).length === 0) && (
-                              <p className="text-gray-500 text-xs italic col-span-full">No se encontraron actividades de speaking.</p>
-                          )}
-                      </div>
-                  </div>
-              )}
-
-              {activityTab === 'create' && (
-                  <div className="animate-fade-in">
-                      <label className={`${styles.label} text-blue-700`}>CREAR Y SELECCIONAR UNA NUEVA ACTIVIDAD EN BLANCO</label>
-                      <div className="flex flex-col sm:flex-row gap-2">
-                          <input 
-                              type="text" 
-                              value={newActivityTitle} 
-                              onChange={e => setNewActivityTitle(e.target.value)}
-                              placeholder="TÍTULO (EJ: LECCIÓN 1)..."
-                              className={`${styles.input} flex-1 py-2 text-xs`}
-                              onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleCreateActivity(); } }}
+            {/* CONTENIDO DE TABS */}
+            {activityTab === 'select' && (
+              <div className="animate-fade-in">
+                <label className={`${styles.label} text-blue-700`}>BUSCAR Y SELECCIONAR ACTIVIDADES DE PRONUNCIACIÓN</label>
+                <input
+                  type="text"
+                  placeholder="BUSCAR ACTIVIDAD..."
+                  value={activitySearchTerm}
+                  onChange={(e) => setActivitySearchTerm(e.target.value)}
+                  className={`${styles.input} mb-4 py-2 text-xs`}
+                />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[300px] overflow-y-auto pr-2 no-scrollbar">
+                  {pronunciationActivities && pronunciationActivities
+                    .filter(act => act.title.toLowerCase().includes(activitySearchTerm.toLowerCase()))
+                    .map(act => (
+                      <div key={act.id} className="flex flex-col sm:flex-row sm:items-center gap-3 bg-white p-3 rounded-xl border border-blue-100 shadow-sm cursor-pointer" onClick={() => handleToggleSpeakingActivity(act.id)}>
+                        <div className="flex items-center gap-3">
+                          <input
+                            type="checkbox"
+                            checked={(editado.speakingActivities || []).includes(act.id)}
+                            readOnly
+                            className="w-5 h-5 accent-black cursor-pointer flex-shrink-0"
                           />
-                          <button 
-                              type="button" 
-                              onClick={handleCreateActivity} 
-                              disabled={isCreatingActivity || !newActivityTitle.trim()} 
-                              className="bg-black text-white font-bold uppercase text-[10px] rounded-xl transition-all py-3 px-6 flex items-center justify-center gap-2 disabled:opacity-50 w-full sm:w-auto"
-                          >
-                              {isCreatingActivity ? 'CREANDO...' : <><FiPlus size={14} /> CREAR Y SELECCIONAR</>}
-                          </button>
+                          <div className="flex flex-col flex-1">
+                            <span className="text-black font-bold text-sm leading-tight">{act.title}</span>
+                            <span className="text-gray-500 text-[10px] mt-1">{act.PronunciationTasks?.length || 0} Tareas</span>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); setManagingActivity(act); }}
+                          className="bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg p-2 transition-colors sm:ml-auto text-xs font-bold w-full sm:w-auto text-center mt-2 sm:mt-0"
+                          title="Gestionar Tareas"
+                        >
+                          TAREAS
+                        </button>
                       </div>
-                      <p className="text-gray-400 text-[10px] italic mt-2 text-center sm:text-left">
-                          Una vez creada, aparecerá seleccionada en tus registros y podrás agregarle tareas.
-                      </p>
-                  </div>
-              )}
-            </section>
+                    ))}
+                  {(!pronunciationActivities || pronunciationActivities.filter(act => act.title.toLowerCase().includes(activitySearchTerm.toLowerCase())).length === 0) && (
+                    <p className="text-gray-500 text-xs italic col-span-full">No se encontraron actividades de speaking.</p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {activityTab === 'create' && (
+              <div className="animate-fade-in">
+                <label className={`${styles.label} text-blue-700`}>CREAR Y SELECCIONAR UNA NUEVA ACTIVIDAD EN BLANCO</label>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <input
+                    type="text"
+                    value={newActivityTitle}
+                    onChange={e => setNewActivityTitle(e.target.value)}
+                    placeholder="TÍTULO (EJ: LECCIÓN 1)..."
+                    className={`${styles.input} flex-1 py-2 text-xs`}
+                    onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleCreateActivity(); } }}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleCreateActivity}
+                    disabled={isCreatingActivity || !newActivityTitle.trim()}
+                    className="bg-black text-white font-bold uppercase text-[10px] rounded-xl transition-all py-3 px-6 flex items-center justify-center gap-2 disabled:opacity-50 w-full sm:w-auto"
+                  >
+                    {isCreatingActivity ? 'CREANDO...' : <><FiPlus size={14} /> CREAR Y SELECCIONAR</>}
+                  </button>
+                </div>
+                <p className="text-gray-400 text-[10px] italic mt-2 text-center sm:text-left">
+                  Una vez creada, aparecerá seleccionada en tus registros y podrás agregarle tareas.
+                </p>
+              </div>
+            )}
+          </section>
 
           {/* GALERÍA DE ACTIVOS */}
           <section>
@@ -495,13 +495,30 @@ const InventarioProductos = () => {
         text: "Esta acción es irreversible.",
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#000000',
-        cancelButtonColor: '#f3f4f6',
         confirmButtonText: 'SÍ, ELIMINAR',
         cancelButtonText: 'CANCELAR',
+        buttonsStyling: false,
         customClass: {
-          confirmButton: 'text-white font-bold uppercase text-xs rounded-xl px-4 py-3',
-          cancelButton: 'text-black font-bold uppercase text-xs rounded-xl px-4 py-3 border border-gray-300'
+          confirmButton: '!bg-white !text-black border border-gray-300 font-bold py-2.5 px-6 rounded-xl mx-2 text-xs uppercase tracking-wider hover:!bg-gray-100',
+          cancelButton: '!bg-white !text-black border border-gray-300 font-bold py-2.5 px-6 rounded-xl mx-2 text-xs uppercase tracking-wider hover:!bg-gray-100'
+        },
+        didOpen: (modal) => {
+          const confirmBtn = modal.querySelector('.swal2-confirm');
+          const cancelBtn = modal.querySelector('.swal2-cancel');
+
+          if (confirmBtn) {
+            confirmBtn.style.setProperty('background-color', '#ffffff', 'important');
+            confirmBtn.style.setProperty('color', '#000000', 'important');
+            confirmBtn.style.setProperty('border', '1px solid #d1d5db', 'important');
+            confirmBtn.style.setProperty('box-shadow', 'none', 'important');
+            confirmBtn.style.setProperty('outline', 'none', 'important');
+          }
+
+          if (cancelBtn) {
+            cancelBtn.style.setProperty('background-color', '#ffffff', 'important');
+            cancelBtn.style.setProperty('color', '#000000', 'important');
+            cancelBtn.style.setProperty('border', '1px solid #d1d5db', 'important');
+          }
         }
       });
 
@@ -511,7 +528,12 @@ const InventarioProductos = () => {
 
       if (response.status === 204) {
         setProductos(productos.filter(p => p.id !== id));
-        Swal.fire({ title: 'ÉXITO', text: 'Producto eliminado correctamente.', icon: 'success', confirmButtonColor: '#000000' });
+        Swal.fire({
+          title: 'ÉXITO',
+          text: 'Producto eliminado correctamente.',
+          icon: 'success',
+          confirmButtonColor: '#000000'
+        });
       }
     } catch (err) {
       console.error("Error al eliminar:", err);
@@ -523,8 +545,21 @@ const InventarioProductos = () => {
           input: 'password',
           inputPlaceholder: 'CONTRASEÑA...',
           showCancelButton: true,
-          confirmButtonColor: '#000000',
-          cancelButtonColor: '#f3f4f6'
+          confirmButtonText: 'CONFIRMAR',
+          cancelButtonText: 'CANCELAR',
+          buttonsStyling: false,
+          customClass: {
+            confirmButton: '!bg-white !text-black border border-gray-300 font-bold py-2.5 px-6 rounded-xl mx-2 text-xs uppercase',
+            cancelButton: '!bg-white !text-black border border-gray-300 font-bold py-2.5 px-6 rounded-xl mx-2 text-xs uppercase'
+          },
+          didOpen: (modal) => {
+            const confirmBtn = modal.querySelector('.swal2-confirm');
+            if (confirmBtn) {
+              confirmBtn.style.setProperty('background-color', '#ffffff', 'important');
+              confirmBtn.style.setProperty('color', '#000000', 'important');
+              confirmBtn.style.setProperty('border', '1px solid #d1d5db', 'important');
+            }
+          }
         });
 
         if (pass) {
@@ -543,18 +578,17 @@ const InventarioProductos = () => {
       }
     }
   };
-
   const obtenerProductos = async () => {
     try {
       setLoading(true);
       const response = await axios.get(`${import.meta.env.VITE_API_URL}/products`);
       const allData = response.data.products || response.data || [];
       const onlyProducts = allData.filter(p => {
-          const isCourse = p.esInfoproducto === true || 
-                           String(p.esInfoproducto) === 'true' || 
-                           (p.categoria && p.categoria.toLowerCase() === 'cursos') || 
-                           (Array.isArray(p.archivosInfoproducto) && p.archivosInfoproducto.length > 0);
-          return !isCourse;
+        const isCourse = p.esInfoproducto === true ||
+          String(p.esInfoproducto) === 'true' ||
+          (p.categoria && p.categoria.toLowerCase() === 'cursos') ||
+          (Array.isArray(p.archivosInfoproducto) && p.archivosInfoproducto.length > 0);
+        return !isCourse;
       });
       setProductos(onlyProducts);
       setError(null);
@@ -683,10 +717,10 @@ const InventarioProductos = () => {
               </div>
 
               <div className="hidden md:flex flex-col items-center w-1/6">
-                 <span className="text-[10px] font-bold text-gray-500 uppercase mb-1">STOCK</span>
-                 <div className={`px-3 py-1 text-xs font-bold rounded-lg border ${isLowStock ? 'bg-red-50 text-red-600 border-red-200' : 'bg-gray-50 text-black border-gray-200'}`}>
-                    {totalStock}
-                 </div>
+                <span className="text-[10px] font-bold text-gray-500 uppercase mb-1">STOCK</span>
+                <div className={`px-3 py-1 text-xs font-bold rounded-lg border ${isLowStock ? 'bg-red-50 text-red-600 border-red-200' : 'bg-gray-50 text-black border-gray-200'}`}>
+                  {totalStock}
+                </div>
               </div>
 
               <div className="flex justify-end items-center gap-2" onClick={e => e.stopPropagation()}>
@@ -698,10 +732,10 @@ const InventarioProductos = () => {
           );
         })}
         {productosFiltrados.length === 0 && (
-           <div className={`${styles.card} flex flex-col items-center justify-center py-12`}>
-             <FiSearch size={40} className="text-gray-300 mb-4" />
-             <p className="font-bold text-sm uppercase text-gray-500">NO SE ENCONTRARON PRODUCTOS</p>
-           </div>
+          <div className={`${styles.card} flex flex-col items-center justify-center py-12`}>
+            <FiSearch size={40} className="text-gray-300 mb-4" />
+            <p className="font-bold text-sm uppercase text-gray-500">NO SE ENCONTRARON PRODUCTOS</p>
+          </div>
         )}
       </div>
 

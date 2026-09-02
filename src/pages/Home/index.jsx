@@ -876,7 +876,7 @@ const HOME = () => {
                   whileHover={{ y: -6 }}
                   transition={{ duration: 0.3 }}
                   className="bg-[#3D1A20] rounded-2xl overflow-hidden border border-[#E8DDD3]/20 shadow-xl flex flex-col justify-between group cursor-pointer"
-                  onClick={() => navigate('/reservar')}
+                  onClick={() => navigate('/curso/' + (curso.id || curso._id))}
                 >
                   <div>
                     {/* Course Banner Image */}
@@ -923,10 +923,10 @@ const HOME = () => {
                   {/* Course Action Button */}
                   <div className="p-5 pt-0">
                     <button
-                      onClick={(e) => { e.stopPropagation(); navigate('/reservar'); }}
+                      onClick={(e) => { e.stopPropagation(); navigate('/curso/' + (curso.id || curso._id)); }}
                       className="w-full py-3 bg-[#F3ECE7] text-[#3D1A20] hover:bg-white text-xs font-bold uppercase tracking-widest rounded-xl transition-all shadow-md group-hover:scale-[1.02]"
                     >
-                      INSCRIBIRSE AHORA ✨
+                      VER DETALLES ✨
                     </button>
                   </div>
                 </motion.div>

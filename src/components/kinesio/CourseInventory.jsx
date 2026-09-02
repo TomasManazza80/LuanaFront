@@ -113,12 +113,12 @@ const CourseInventory = () => {
                 text: "Esta acción es irreversible.",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#0058be',
+                confirmButtonColor: '#ffffff',
                 cancelButtonColor: '#f3f4f6',
                 confirmButtonText: 'SÍ, ELIMINAR',
                 cancelButtonText: 'CANCELAR',
                 customClass: {
-                    confirmButton: 'text-white font-bold uppercase text-xs rounded-xl px-4 py-3',
+                    confirmButton: 'text-black border border-gray-300 font-bold uppercase text-xs rounded-xl px-4 py-3',
                     cancelButton: 'text-black font-bold uppercase text-xs rounded-xl px-4 py-3 border border-gray-300'
                 }
             });
@@ -140,8 +140,12 @@ const CourseInventory = () => {
                     input: 'password',
                     inputPlaceholder: 'CONTRASEÑA...',
                     showCancelButton: true,
-                    confirmButtonColor: '#0058be',
-                    cancelButtonColor: '#f3f4f6'
+                    confirmButtonColor: '#ffffff',
+                    cancelButtonColor: '#f3f4f6',
+                    customClass: {
+                        confirmButton: 'text-black border border-gray-300',
+                        cancelButton: 'text-black'
+                    }
                 });
 
                 if (pass) {

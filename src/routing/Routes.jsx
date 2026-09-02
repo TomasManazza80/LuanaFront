@@ -25,6 +25,7 @@ import CargaMercaderiaMasiva from "../pages/admin/productos/cargaMercaderiaMasiv
 import MisCursos from "../pages/MisCursos/MisCursos.jsx";
 import AdminPronunciation from "../pages/AdminPronunciation.jsx";
 import StudentPronunciation from "../pages/StudentPronunciation.jsx";
+import CourseDetails from "../pages/ProductDetails/CourseDetails.jsx";
 
 
 
@@ -75,6 +76,7 @@ function MyRoutes() {
           <Route path="cart-wholesale" element={<CartWholesale />} />
           <Route path="producto-mayorista/:id" element={<ProductDetailsWholesale />} />
           <Route path="product/:id" element={<ProductDetails />} />
+          <Route path="curso/:id" element={<CourseDetails />} />
           <Route path="products" element={<Products />}></Route>
           <Route path="success" element={<PagoExitoso />} />
           <Route path="about" element={<About />} />

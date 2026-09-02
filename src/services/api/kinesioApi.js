@@ -260,6 +260,13 @@ export const kinesioApi = authApi.injectEndpoints({
             }),
             invalidatesTags: ['WhatsApp']
         }),
+        sendWhatsappMessage: build.mutation({
+            query: (data) => ({
+                url: `/api/whatsapp/send-message`,
+                method: 'POST',
+                body: data
+            })
+        }),
         saveWhatsappTemplate: build.mutation({
             query: ({ template, profId }) => ({
                 url: `/api/whatsapp/template`,
@@ -351,6 +358,7 @@ export const {
     useStartWhatsappMutation,
     useGetWhatsappQrQuery,
     useDisconnectWhatsappMutation,
+    useSendWhatsappMessageMutation,
     useSaveWhatsappTemplateMutation,
     useGetTemplatesQuery,
     useCreateTemplateMutation,

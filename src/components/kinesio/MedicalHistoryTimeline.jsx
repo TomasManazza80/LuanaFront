@@ -7,12 +7,13 @@ import {
     useGetTemplatesQuery,
     useCreateMedicalHistoryMutation,
     useUpdateMedicalHistoryMutation,
-    useUploadImageMutation
+    useUploadImageMutation,
+    useUpdatePatientMutation
 } from '../../services/api/kinesioApi.js';
 import { 
     Activity, Stethoscope, Droplet, User, History, Mic, ShieldPlus as Shield, 
     ClipboardList, Save, Plus, ArrowLeft, Image as ImageIcon, Loader2, X, Camera, 
-    Settings, Search, CheckCircle2, Clock, FileText, ChevronDown, ChevronUp, Sliders, Check, Layers, Pencil 
+    Settings, Search, CheckCircle2, Clock, FileText, ChevronDown, ChevronUp, Sliders, Check, Layers, Pencil, Edit2 
 } from 'lucide-react';
 import { toast } from '../ui/use-toast.tsx';
 import moment from 'moment';
@@ -35,6 +36,7 @@ const MedicalHistoryEntry = () => {
   const [createMedicalHistory, { isLoading: isSaving }] = useCreateMedicalHistoryMutation();
   const [updateMedicalHistory, { isLoading: isUpdatingHistory }] = useUpdateMedicalHistoryMutation();
   const [uploadImage] = useUploadImageMutation();
+  const [updatePatient, { isLoading: isUpdatingPatient }] = useUpdatePatientMutation();
 
   const [selectedTemplateId, setSelectedTemplateId] = useState(null);
   const [isTemplateSelectorOpen, setIsTemplateSelectorOpen] = useState(false);
@@ -55,6 +57,8 @@ const MedicalHistoryEntry = () => {
   const [viewMode, setViewMode] = useState(isTemplateMode ? 'template' : 'history'); // 'history', 'new', 'template'
   const [searchTerm, setSearchTerm] = useState('');
   const [showPrevious, setShowPrevious] = useState(false);
+  const [isEditingPatient, setIsEditingPatient] = useState(false);
+  const [editingPatientData, setEditingPatientData] = useState({});
 
   useEffect(() => {
     if (isTemplateMode) {
@@ -271,11 +275,11 @@ const MedicalHistoryEntry = () => {
             <div className="flex items-center gap-2 flex-wrap">
               {isLatest ? (
                 <span className="px-3 py-1 rounded-full bg-blue-50 text-[#0A58CA] border border-blue-100 text-xs font-extrabold tracking-wide uppercase flex items-center gap-1.5 shadow-xs">
-                  <Stethoscope size={14} /> Última Consulta
+                  <Stethoscope size={14} /> Último Servicio
                 </span>
               ) : (
                 <span className="px-2.5 py-0.5 rounded-md bg-gray-100 text-gray-600 text-xs font-bold">
-                  Consulta Previa
+                  Servicio Previo
                 </span>
               )}
               {isDynamic && consultation.template_name && (
@@ -311,7 +315,7 @@ const MedicalHistoryEntry = () => {
             className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 rounded-xl text-xs font-bold transition-colors shadow-xs"
             title="Editar este registro médico"
           >
-            <Pencil size={14} /> Editar Consulta
+            <Pencil size={14} /> Editar Servicio
           </button>
         </div>
 
@@ -356,31 +360,20 @@ const MedicalHistoryEntry = () => {
           <div className="space-y-4">
             {consultation.reason_for_visit && (
               <div>
-                <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Motivo de la Consulta</h4>
+                <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Servicio Solicitado</h4>
                 <p className="text-sm text-gray-800 font-medium bg-gray-50 p-3 rounded-xl border border-gray-100">
                   {consultation.reason_for_visit}
                 </p>
               </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {(consultation.blood_pressure || consultation.heart_rate) && (
-                <div>
-                  <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5 mb-1">
-                    <Activity size={14} className="text-[#0A58CA]"/> Signos Vitales
-                  </h4>
-                  <div className="text-sm text-gray-700 bg-gray-50 p-3 rounded-xl border border-gray-100 font-medium">
-                    <span>PA: <strong className="text-gray-900">{consultation.blood_pressure || '-'}</strong></span>
-                    <span className="mx-2">•</span>
-                    <span>FC: <strong className="text-gray-900">{consultation.heart_rate || '-'}</strong></span>
-                  </div>
-                </div>
-              )}
 
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {consultation.diagnostico && (
                 <div>
                   <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5 mb-1">
-                    <Shield size={14} className="text-[#0A58CA]"/> Diagnóstico
+                    <Shield size={14} className="text-[#0A58CA]"/> Evaluación Inicial
                   </h4>
                   <div className="text-sm text-gray-800 bg-gray-50 p-3 rounded-xl border border-gray-100 font-medium">
                     {consultation.diagnostico}
@@ -391,7 +384,7 @@ const MedicalHistoryEntry = () => {
 
             {consultation.physical_findings && (
               <div>
-                <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Examen / Hallazgos Físicos</h4>
+                <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Observaciones / Análisis Inicial</h4>
                 <div className="text-sm text-gray-800 bg-gray-50 p-3 rounded-xl border border-gray-100 whitespace-pre-wrap">
                   {consultation.physical_findings}
                 </div>
@@ -401,7 +394,7 @@ const MedicalHistoryEntry = () => {
             {consultation.tratamiento && (
               <div>
                 <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5 mb-1">
-                  <ClipboardList size={14} className="text-[#0A58CA]"/> Plan de Tratamiento
+                  <ClipboardList size={14} className="text-[#0A58CA]"/> Tratamiento Realizado
                 </h4>
                 <div className="text-sm text-gray-800 bg-gray-50 p-3.5 rounded-xl border border-gray-100 whitespace-pre-wrap font-medium">
                   {consultation.tratamiento}
@@ -442,8 +435,8 @@ const MedicalHistoryEntry = () => {
               <ArrowLeft size={16} />
           </button>
           <div>
-            <h1 className="text-xl md:text-2xl font-bold tracking-tight text-[#111827]">Historia Clínica</h1>
-            <p className="text-xs text-gray-500 mt-0.5">Gestión de historiales, evoluciones y plantillas.</p>
+            <h1 className="text-xl md:text-2xl font-bold tracking-tight text-[#111827]">Ficha del Cliente</h1>
+            <p className="text-xs text-gray-500 mt-0.5">Gestión de historial de servicios y tratamientos.</p>
           </div>
         </div>
 
@@ -453,7 +446,7 @@ const MedicalHistoryEntry = () => {
             <button 
               onClick={() => setIsTemplateSelectorOpen(!isTemplateSelectorOpen)}
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition-all shadow-sm"
-              title="Seleccionar estructura de historia clínica"
+              title="Seleccionar estructura de ficha del cliente"
             >
               <Sliders size={18} className="text-[#0A58CA]" /> 
               <span className="truncate max-w-[180px]">{selectedTemplate ? selectedTemplate.name : 'Formulario Estándar'}</span>
@@ -546,7 +539,7 @@ const MedicalHistoryEntry = () => {
       {viewMode === 'template' ? (
           <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
               <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                  <Settings className="text-purple-600" /> {editingTemplate ? `Editando Plantilla: ${editingTemplate.name}` : 'Constructor de Plantillas Clínicas'}
+                  <Settings className="text-purple-600" /> {editingTemplate ? `Editando Plantilla: ${editingTemplate.name}` : 'Constructor de Plantillas de Servicios'}
               </h3>
               <div className="border border-gray-200 rounded-xl overflow-hidden">
                   <TemplateBuilder 
@@ -578,12 +571,28 @@ const MedicalHistoryEntry = () => {
               <h2 className="text-lg font-bold text-gray-900 leading-tight">{patient.nombre}</h2>
               <div className="flex items-center gap-4 mt-1 text-sm text-gray-500 font-medium">
                 <span className="flex items-center gap-1.5"><User size={14} /> {calculateAge(patient.fecha_nacimiento)} años</span>
-                <span className="flex items-center gap-1.5"><Droplet size={14} /> {patient.blood_type || 'N/A'}</span>
                 <span className="flex items-center gap-1.5"><User size={14} /> {patient.gender === 'M' ? 'Masculino' : patient.gender === 'F' ? 'Femenino' : 'Otro'}</span>
               </div>
             </div>
           </div>
           <div className="flex items-center gap-3">
+            <button 
+                onClick={() => {
+                  setEditingPatientData({
+                    id: patient.id,
+                    nombre: patient.nombre || '',
+                    dni: patient.dni || '',
+                    fecha_nacimiento: patient.fecha_nacimiento ? new Date(patient.fecha_nacimiento).toISOString().split('T')[0] : '',
+                    gender: patient.gender || '',
+                    email: patient.datos_contacto?.email || '',
+                    phone: patient.datos_contacto?.phone || ''
+                  });
+                  setIsEditingPatient(true);
+                }}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-colors border border-gray-200 bg-white hover:bg-gray-50 text-gray-700"
+            >
+              <Edit2 size={16} /> Editar Perfil
+            </button>
             <button 
                 onClick={() => setViewMode(viewMode === 'history' ? 'new' : 'history')}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${viewMode === 'history' ? 'bg-[#0A58CA] text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}
@@ -695,7 +704,7 @@ const MedicalHistoryEntry = () => {
                   <div className="bg-white rounded-2xl border border-amber-200 bg-amber-50/50 p-4 shadow-sm flex items-center justify-between">
                       <div className="flex items-center gap-2 text-sm text-amber-900 font-bold">
                           <Pencil size={18} className="text-amber-600" />
-                          <span>Editando consulta realizada ({moment(editingConsultation.date).format('DD/MM/YYYY HH:mm [hs]')})</span>
+                          <span>Editando servicio realizado ({moment(editingConsultation.date).format('DD/MM/YYYY HH:mm [hs]')})</span>
                       </div>
                       <button 
                           onClick={() => { setViewMode('history'); setEditingConsultation(null); }}
@@ -714,7 +723,7 @@ const MedicalHistoryEntry = () => {
                           if (refetchHistory) refetchHistory();
                           setViewMode('history');
                           setEditingConsultation(null);
-                          toast({ title: 'Éxito', description: 'Registro actualizado en la historia clínica.', variant: 'success' });
+                          toast({ title: 'Éxito', description: 'Registro actualizado en el historial.', variant: 'success' });
                       }} 
                       onCancel={() => { setViewMode('history'); setEditingConsultation(null); }} 
                   />
@@ -724,7 +733,7 @@ const MedicalHistoryEntry = () => {
                   <div className="bg-white rounded-2xl border border-amber-200 bg-amber-50/50 p-4 shadow-sm flex items-center justify-between">
                       <div className="flex items-center gap-2 text-sm text-amber-900 font-bold">
                           <Pencil size={18} className="text-amber-600" />
-                          <span>Editando consulta histórica ({moment(editingConsultation.date).format('DD/MM/YYYY HH:mm [hs]')})</span>
+                          <span>Editando servicio histórico ({moment(editingConsultation.date).format('DD/MM/YYYY HH:mm [hs]')})</span>
                       </div>
                       <button 
                           onClick={() => { setViewMode('history'); setEditingConsultation(null); }}
@@ -757,42 +766,17 @@ const MedicalHistoryEntry = () => {
                     <div className="flex justify-between items-center mb-5">
                       <div className="flex items-center gap-2 text-[#0A58CA]">
                         <Activity size={20} strokeWidth={2.5} />
-                        <h3 className="text-lg font-bold text-gray-900">Examen Físico</h3>
+                        <h3 className="text-lg font-bold text-gray-900">Análisis Inicial</h3>
                       </div>
                       <SpeechToTextButton onTranscript={(text) => handleSpeechInput('physical_findings', text)} />
                     </div>
                     
-                    <div className="flex flex-col md:flex-row gap-4 mb-4">
-                      <div className="flex-1">
-                        <label className="block text-xs font-bold text-gray-500 mb-1.5">Presión Arterial</label>
-                        <input 
-                          type="text" 
-                          name="blood_pressure"
-                          value={formData.blood_pressure}
-                          onChange={handleInputChange}
-                          className="w-full bg-[#F1F5F9] border-transparent rounded-xl px-4 py-3 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0A58CA]"
-                          placeholder="ej. 120/80 mmHg"
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <label className="block text-xs font-bold text-gray-500 mb-1.5">Frecuencia Cardíaca</label>
-                        <input 
-                          type="text" 
-                          name="heart_rate"
-                          value={formData.heart_rate}
-                          onChange={handleInputChange}
-                          className="w-full bg-[#F1F5F9] border-transparent rounded-xl px-4 py-3 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0A58CA]"
-                          placeholder="ej. 72 lpm"
-                        />
-                      </div>
-                    </div>
-
                     <textarea 
                       name="physical_findings"
                       value={formData.physical_findings}
                       onChange={handleInputChange}
                       className="w-full bg-[#F1F5F9] border-transparent rounded-xl p-4 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0A58CA] resize-none h-32"
-                      placeholder="Hallazgos físicos detallados..."
+                      placeholder="Observaciones iniciales..."
                     ></textarea>
                   </div>
 
@@ -804,7 +788,7 @@ const MedicalHistoryEntry = () => {
                       <div className="flex justify-between items-center mb-4">
                         <div className="flex items-center gap-2 text-[#0A58CA]">
                           <Shield size={20} strokeWidth={2.5} />
-                          <h3 className="text-lg font-bold text-gray-900">Diagnóstico</h3>
+                          <h3 className="text-lg font-bold text-gray-900">Evaluación Inicial</h3>
                         </div>
                         <SpeechToTextButton onTranscript={(text) => handleSpeechInput('diagnostico', text)} />
                       </div>
@@ -813,7 +797,7 @@ const MedicalHistoryEntry = () => {
                         value={formData.diagnostico}
                         onChange={handleInputChange}
                         className="w-full bg-[#F1F5F9] border-transparent rounded-xl p-4 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0A58CA] resize-none h-32"
-                        placeholder="Diagnósticos principales y secundarios..."
+                        placeholder="Evaluaciones principales y secundarias..."
                       ></textarea>
                     </div>
 
@@ -822,7 +806,7 @@ const MedicalHistoryEntry = () => {
                       <div className="flex justify-between items-center mb-4">
                         <div className="flex items-center gap-2 text-[#0A58CA]">
                           <ClipboardList size={20} strokeWidth={2.5} />
-                          <h3 className="text-lg font-bold text-gray-900">Plan de Tratamiento</h3>
+                          <h3 className="text-lg font-bold text-gray-900">Tratamiento Realizado</h3>
                         </div>
                         <SpeechToTextButton onTranscript={(text) => handleSpeechInput('tratamiento', text)} />
                       </div>
@@ -831,7 +815,7 @@ const MedicalHistoryEntry = () => {
                         value={formData.tratamiento}
                         onChange={handleInputChange}
                         className="w-full bg-[#F1F5F9] border-transparent rounded-xl p-4 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0A58CA] resize-none h-32"
-                        placeholder="Medicamentos, procedimientos y recomendaciones..."
+                        placeholder="Productos utilizados, procedimientos y recomendaciones..."
                       ></textarea>
                     </div>
 
@@ -882,7 +866,7 @@ const MedicalHistoryEntry = () => {
                   <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm flex items-center justify-between">
                       <div className="flex items-center gap-2 text-sm text-gray-700 font-medium">
                           <Layers size={18} className="text-[#0A58CA]" />
-                          <span>Estructura de historia clínica activa: <strong className="text-gray-900 font-bold">{selectedTemplate.name}</strong></span>
+                          <span>Estructura de ficha activa: <strong className="text-gray-900 font-bold">{selectedTemplate.name}</strong></span>
                       </div>
                       <button 
                           onClick={() => setViewMode('history')}
@@ -898,7 +882,7 @@ const MedicalHistoryEntry = () => {
                           if (refetchRecords) refetchRecords();
                           if (refetchHistory) refetchHistory();
                           setViewMode('history');
-                          toast({ title: 'Éxito', description: 'Registro guardado en la historia clínica.', variant: 'success' });
+                          toast({ title: 'Éxito', description: 'Registro guardado en el historial.', variant: 'success' });
                       }} 
                       onCancel={() => setViewMode('history')} 
                   />
@@ -928,42 +912,17 @@ const MedicalHistoryEntry = () => {
                     <div className="flex justify-between items-center mb-5">
                       <div className="flex items-center gap-2 text-[#0A58CA]">
                         <Activity size={20} strokeWidth={2.5} />
-                        <h3 className="text-lg font-bold text-gray-900">Examen Físico</h3>
+                        <h3 className="text-lg font-bold text-gray-900">Análisis Inicial</h3>
                       </div>
                       <SpeechToTextButton onTranscript={(text) => handleSpeechInput('physical_findings', text)} />
                     </div>
                     
-                    <div className="flex flex-col md:flex-row gap-4 mb-4">
-                      <div className="flex-1">
-                        <label className="block text-xs font-bold text-gray-500 mb-1.5">Presión Arterial</label>
-                        <input 
-                          type="text" 
-                          name="blood_pressure"
-                          value={formData.blood_pressure}
-                          onChange={handleInputChange}
-                          className="w-full bg-[#F1F5F9] border-transparent rounded-xl px-4 py-3 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0A58CA]"
-                          placeholder="ej. 120/80 mmHg"
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <label className="block text-xs font-bold text-gray-500 mb-1.5">Frecuencia Cardíaca</label>
-                        <input 
-                          type="text" 
-                          name="heart_rate"
-                          value={formData.heart_rate}
-                          onChange={handleInputChange}
-                          className="w-full bg-[#F1F5F9] border-transparent rounded-xl px-4 py-3 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0A58CA]"
-                          placeholder="ej. 72 lpm"
-                        />
-                      </div>
-                    </div>
-
                     <textarea 
                       name="physical_findings"
                       value={formData.physical_findings}
                       onChange={handleInputChange}
                       className="w-full bg-[#F1F5F9] border-transparent rounded-xl p-4 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0A58CA] resize-none h-32"
-                      placeholder="Hallazgos físicos detallados..."
+                      placeholder="Observaciones iniciales..."
                     ></textarea>
                   </div>
 
@@ -975,7 +934,7 @@ const MedicalHistoryEntry = () => {
                       <div className="flex justify-between items-center mb-4">
                         <div className="flex items-center gap-2 text-[#0A58CA]">
                           <Shield size={20} strokeWidth={2.5} />
-                          <h3 className="text-lg font-bold text-gray-900">Diagnóstico</h3>
+                          <h3 className="text-lg font-bold text-gray-900">Evaluación Inicial</h3>
                         </div>
                         <SpeechToTextButton onTranscript={(text) => handleSpeechInput('diagnostico', text)} />
                       </div>
@@ -984,7 +943,7 @@ const MedicalHistoryEntry = () => {
                         value={formData.diagnostico}
                         onChange={handleInputChange}
                         className="w-full bg-[#F1F5F9] border-transparent rounded-xl p-4 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0A58CA] resize-none h-32"
-                        placeholder="Diagnósticos principales y secundarios..."
+                        placeholder="Evaluaciones principales y secundarias..."
                       ></textarea>
                     </div>
 
@@ -993,7 +952,7 @@ const MedicalHistoryEntry = () => {
                       <div className="flex justify-between items-center mb-4">
                         <div className="flex items-center gap-2 text-[#0A58CA]">
                           <ClipboardList size={20} strokeWidth={2.5} />
-                          <h3 className="text-lg font-bold text-gray-900">Plan de Tratamiento</h3>
+                          <h3 className="text-lg font-bold text-gray-900">Tratamiento Realizado</h3>
                         </div>
                         <SpeechToTextButton onTranscript={(text) => handleSpeechInput('tratamiento', text)} />
                       </div>
@@ -1002,7 +961,7 @@ const MedicalHistoryEntry = () => {
                         value={formData.tratamiento}
                         onChange={handleInputChange}
                         className="w-full bg-[#F1F5F9] border-transparent rounded-xl p-4 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0A58CA] resize-none h-32"
-                        placeholder="Medicamentos, procedimientos y recomendaciones..."
+                        placeholder="Productos utilizados, procedimientos y recomendaciones..."
                       ></textarea>
                     </div>
 
@@ -1050,6 +1009,127 @@ const MedicalHistoryEntry = () => {
       ) : null}
       
         </>
+      )}
+
+      {isEditingPatient && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg flex flex-col max-h-[90vh] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                <div className="flex justify-between items-center p-5 border-b border-gray-100 shrink-0">
+                    <h3 className="font-bold text-lg text-gray-900">Editar Perfil del Cliente</h3>
+                    <button type="button" onClick={() => setIsEditingPatient(false)} className="text-gray-400 hover:text-gray-600"><X size={20}/></button>
+                </div>
+                <form 
+                    onSubmit={async (e) => {
+                        e.preventDefault();
+                        try {
+                            const payload = {
+                                nombre: editingPatientData.nombre,
+                                dni: editingPatientData.dni,
+                                fecha_nacimiento: editingPatientData.fecha_nacimiento || null,
+                                gender: editingPatientData.gender,
+                                email: editingPatientData.email,
+                                phone: editingPatientData.phone,
+                                datos_contacto: {
+                                    email: editingPatientData.email,
+                                    phone: editingPatientData.phone
+                                }
+                            };
+                            await updatePatient({ id: editingPatientData.id, ...payload }).unwrap();
+                            toast({ title: 'Éxito', description: 'Perfil actualizado correctamente.', variant: 'success' });
+                            setIsEditingPatient(false);
+                        } catch (error) {
+                            toast({ title: 'Error', description: 'No se pudo actualizar el perfil.', variant: 'error' });
+                        }
+                    }} 
+                    className="p-5 flex flex-col gap-4 overflow-y-auto"
+                >
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-1">Nombre Completo *</label>
+                            <input 
+                                type="text" 
+                                required
+                                className="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:outline-none focus:border-blue-500"
+                                value={editingPatientData.nombre}
+                                onChange={(e) => setEditingPatientData({...editingPatientData, nombre: e.target.value})}
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-1">DNI</label>
+                            <input 
+                                type="text" 
+                                className="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:outline-none focus:border-blue-500"
+                                value={editingPatientData.dni}
+                                onChange={(e) => setEditingPatientData({...editingPatientData, dni: e.target.value})}
+                            />
+                        </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-1">Email</label>
+                            <input 
+                                type="email" 
+                                className="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:outline-none focus:border-blue-500"
+                                value={editingPatientData.email}
+                                onChange={(e) => setEditingPatientData({...editingPatientData, email: e.target.value})}
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-1">Teléfono</label>
+                            <input 
+                                type="text" 
+                                className="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:outline-none focus:border-blue-500"
+                                value={editingPatientData.phone}
+                                onChange={(e) => setEditingPatientData({...editingPatientData, phone: e.target.value})}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-1">Fecha de Nacimiento</label>
+                            <input 
+                                type="date"
+                                className="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:outline-none focus:border-blue-500"
+                                value={editingPatientData.fecha_nacimiento}
+                                onChange={(e) => setEditingPatientData({...editingPatientData, fecha_nacimiento: e.target.value})}
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-1">Género</label>
+                            <select 
+                                className="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:outline-none focus:border-blue-500 bg-white"
+                                value={editingPatientData.gender}
+                                onChange={(e) => setEditingPatientData({...editingPatientData, gender: e.target.value})}
+                            >
+                                <option value="">Seleccione</option>
+                                <option value="M">Masculino</option>
+                                <option value="F">Femenino</option>
+                                <option value="Otro">Otro</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div className="mt-4 flex justify-end gap-2">
+                        <button 
+                            type="button" 
+                            onClick={() => setIsEditingPatient(false)}
+                            className="px-4 py-2.5 text-gray-600 font-semibold hover:bg-gray-100 rounded-lg"
+                        >
+                            Cancelar
+                        </button>
+                        <button 
+                            type="submit" 
+                            disabled={isUpdatingPatient}
+                            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg disabled:opacity-50 transition-colors"
+                        >
+                            {isUpdatingPatient ? 'Guardando...' : 'Guardar Cambios'}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
       )}
 
     </div>

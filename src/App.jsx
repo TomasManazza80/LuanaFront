@@ -60,7 +60,7 @@ const AppContent = () => {
         return () => clearTimeout(timer);
     }, []);
 
-    const isPublicRoute = location.pathname === '/' || location.pathname === '/cart' || location.pathname === '/login' || location.pathname === '/signup' || location.pathname === '/signup-admin' || location.pathname === '/reservar' || location.pathname === '/mis-turnos' || location.pathname === '/mis-cursos' || location.pathname.startsWith('/productos') || location.pathname.startsWith('/product/') || location.pathname.startsWith('/producto/');
+    const isPublicRoute = location.pathname === '/' || location.pathname === '/cart' || location.pathname === '/login' || location.pathname === '/signup' || location.pathname === '/signup-admin' || location.pathname === '/reservar' || location.pathname === '/mis-turnos' || location.pathname === '/mis-cursos' || location.pathname.startsWith('/productos') || location.pathname.startsWith('/product/') || location.pathname.startsWith('/producto/') || location.pathname.startsWith('/curso/');
     const showNavbar = !isPublicRoute;
 
     const token = useSelector(state => state.authSlice.accessToken)

@@ -1,18 +1,23 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { Clock, Plus, CalendarX, X, ChevronLeft, ChevronRight, Trash2, AlertTriangle } from 'lucide-react';
-import { useGetAvailabilityQuery, useSaveAvailabilityMutation, useGetProfileQuery, useUpdateProfileMutation } from '../../services/api/kinesioApi.js';
+import { useGetAvailabilityQuery, useSaveAvailabilityMutation, useGetProfessionalsQuery, useUpdateProfessionalMutation } from '../../services/api/kinesioApi.js';
 import { toast } from '../ui/use-toast';
 import WhatsAppSettings from '../profile/WhatsAppSettings.jsx';
 
 const DAYS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
 const AvailabilityManager = () => {
-    const { data: profileData, isLoading: isProfileLoading } = useGetProfileQuery();
-    const myProfId = profileData?.data?.id?.toString() || profileData?.data?._id?.toString() || '';
+    const userInfo = useSelector((state) => state.authSlice?.userInfo || state.auth?.userInfo);
+    const myProfId = userInfo?.id?.toString() || userInfo?._id?.toString() || '';
 
     const { data, isLoading } = useGetAvailabilityQuery(myProfId || undefined, { skip: !myProfId });
     const [saveAvailability, { isLoading: isSaving }] = useSaveAvailabilityMutation();
-    const [updateProfile, { isLoading: isUpdatingProfile }] = useUpdateProfileMutation();
+    const [updateProfessional, { isLoading: isUpdatingProfile }] = useUpdateProfessionalMutation();
+    
+    const { data: profData, isLoading: isProfLoading } = useGetProfessionalsQuery();
+    const professionals = profData?.data || [];
+    const myProfileData = professionals.find(p => p.id?.toString() === myProfId);
 
     // Map day -> array of { start_time, end_time }
     const [schedules, setSchedules] = useState({});
@@ -25,13 +30,13 @@ const AvailabilityManager = () => {
     const [mpAuthUrl, setMpAuthUrl] = useState('');
 
     useEffect(() => {
-        if (profileData?.data) {
-            const fee = Number(profileData.data.session_fee);
+        if (myProfileData) {
+            const fee = Number(myProfileData.session_fee);
             setSessionFee(fee === 0 || isNaN(fee) ? '' : fee.toString());
-            setRequirePayment(!!profileData.data.require_payment);
-            setMpAccessToken(profileData.data.mp_access_token || '');
+            setRequirePayment(!!myProfileData.require_payment);
+            setMpAccessToken(myProfileData.mp_access_token || '');
         }
-    }, [profileData]);
+    }, [myProfileData]);
 
     useEffect(() => {
         // Fetch MP Auth URL if token is missing
@@ -134,7 +139,7 @@ const AvailabilityManager = () => {
                 require_payment: requirePayment
             };
 
-            await updateProfile(feePayload).unwrap();
+            await updateProfessional({ id: myProfId, ...feePayload }).unwrap();
             
             toast({ title: 'Éxito', description: 'Configuración guardada correctamente', variant: 'success' });
         } catch (error) {
@@ -142,7 +147,7 @@ const AvailabilityManager = () => {
         }
     };
 
-    if (isLoading || isProfileLoading) return <div className="p-8">Cargando...</div>;
+    if (isLoading || isProfLoading) return <div className="p-8">Cargando...</div>;
 
     return (
         <div className="w-full max-w-full overflow-x-hidden bg-[#F8FAFC] p-3 md:p-5 flex flex-col gap-4 font-sans">
@@ -293,7 +298,7 @@ const AvailabilityManager = () => {
                             </button>
                             <button 
                                 onClick={() => {
-                                    updateProfile({ mp_access_token: null, mp_refresh_token: null, mp_user_id: null })
+                                    updateProfessional({ id: myProfId, mp_access_token: null, mp_refresh_token: null, mp_user_id: null })
                                     .unwrap().then(() => {
                                         setMpAccessToken('');
                                         setShowDisconnectModal(false);

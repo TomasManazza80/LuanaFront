@@ -6,7 +6,7 @@ import {
   FiCheck, FiSliders, FiImage, FiType, FiLayers, FiHelpCircle, FiArrowRight,
   FiUploadCloud, FiTrash2, FiLink, FiLoader, FiNavigation, FiPlus
 } from 'react-icons/fi';
-import videoHero from '../../../media/video1.mp4';
+import videoHero from '../../../images/fondo.mp4';
 
 // Configuración de contenido por defecto para el Home
 export const DEFAULT_HOME_CONTENT = {
@@ -755,7 +755,7 @@ export default function GestorHomeLive() {
                               currentMedia={item.image}
                               onMediaChange={(val) => {
                                 const newItems = [...content.manicureSection.items];
-                                newItems[i].image = val;
+                                newItems[i] = { ...newItems[i], image: val };
                                 updateField('manicureSection.items', newItems);
                               }}
                               className="w-full h-full"
@@ -781,7 +781,7 @@ export default function GestorHomeLive() {
                                 value={item.title} 
                                 onChange={(val) => {
                                   const newItems = [...content.manicureSection.items];
-                                  newItems[i].title = val;
+                                  newItems[i] = { ...newItems[i], title: val };
                                   updateField('manicureSection.items', newItems);
                                 }} 
                               />
@@ -791,7 +791,7 @@ export default function GestorHomeLive() {
                                 value={item.subtitle} 
                                 onChange={(val) => {
                                   const newItems = [...content.manicureSection.items];
-                                  newItems[i].subtitle = val;
+                                  newItems[i] = { ...newItems[i], subtitle: val };
                                   updateField('manicureSection.items', newItems);
                                 }} 
                               />
@@ -851,7 +851,7 @@ export default function GestorHomeLive() {
                             currentMedia={slide.image}
                             onMediaChange={(val) => {
                               const newSlides = [...content.pedicureSection.slides];
-                              newSlides[idx].image = val;
+                              newSlides[idx] = { ...newSlides[idx], image: val };
                               updateField('pedicureSection.slides', newSlides);
                             }}
                             className="w-full h-full"
@@ -884,7 +884,7 @@ export default function GestorHomeLive() {
                               value={slide.title} 
                               onChange={(val) => {
                                 const newSlides = [...content.pedicureSection.slides];
-                                newSlides[idx].title = val;
+                                newSlides[idx] = { ...newSlides[idx], title: val };
                                 updateField('pedicureSection.slides', newSlides);
                               }} 
                             />
@@ -894,7 +894,7 @@ export default function GestorHomeLive() {
                               value={slide.subtitle} 
                               onChange={(val) => {
                                 const newSlides = [...content.pedicureSection.slides];
-                                newSlides[idx].subtitle = val;
+                                newSlides[idx] = { ...newSlides[idx], subtitle: val };
                                 updateField('pedicureSection.slides', newSlides);
                               }} 
                             />

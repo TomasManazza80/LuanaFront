@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Search, X, Filter } from "lucide-react";
 import PublicNavbar from "../../components/nav/PublicNavbar.jsx";
-import videoHero from "../../media/video1.mp4";
-import heroBgPhoto from "../../media/foto1.jpg";
+import heroBgPhoto from "../../images/fondoHero.jpg";
+import defaultVideoHero from "../../images/fondo.mp4";
 
 const HOME = () => {
   const navigate = useNavigate();
@@ -325,34 +325,18 @@ const HOME = () => {
       {/* 2. HERO MONOGRAM & PHONE MOCKUP WITH AUTOMATIC PHOTO SLIDESHOW */}
       <section className="py-8 md:py-14 px-4 sm:px-6 md:px-12 flex flex-col items-center justify-center relative overflow-hidden min-h-[50vh] md:min-h-[55vh]">
 
-        {/* Background Video (if configured) or Automatic Photo Slider */}
-        {homeContent?.hero?.bgVideo ? (
-          <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-            <video
-              key={homeContent.hero.bgVideo}
-              src={homeContent.hero.bgVideo}
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="w-full h-full object-cover opacity-70"
-            />
-          </div>
-        ) : (
-          <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-            <AnimatePresence mode="popLayout">
-              <motion.div
-                key={currentHeroSlide}
-                initial={{ opacity: 0, x: "100%", scale: 1.04 }}
-                animate={{ opacity: 1, x: "0%", scale: 1 }}
-                exit={{ opacity: 0, x: "-100%", scale: 0.96 }}
-                transition={{ duration: 1.4, ease: [0.25, 1, 0.5, 1] }}
-                className="absolute inset-0 bg-cover bg-center"
-                style={{ backgroundImage: `url(${heroBgSlides[currentHeroSlide]})` }}
-              />
-            </AnimatePresence>
-          </div>
-        )}
+        {/* Background Video */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+          <video
+            key={homeContent?.hero?.bgVideo || 'default-bg'}
+            src={homeContent?.hero?.bgVideo || defaultVideoHero}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover opacity-70"
+          />
+        </div>
 
         {/* Dark Luxury Vignette & Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-[#2E1318]/90 via-[#3D1A20]/80 to-[#2E1318]/90 backdrop-blur-[2px] pointer-events-none z-0" />
@@ -439,8 +423,8 @@ const HOME = () => {
 
                   {/* Video Player */}
                   <video
-                    key={homeContent?.hero?.phoneVideo || 'default'}
-                    src={homeContent?.hero?.phoneVideo || videoHero}
+                    key={homeContent?.hero?.phoneVideo || 'default-phone'}
+                    src={homeContent?.hero?.phoneVideo || defaultVideoHero}
                     autoPlay
                     loop
                     muted

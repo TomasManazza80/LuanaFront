@@ -69,8 +69,8 @@ const LoginCard = () => {
     return (
         <PublicAuthLayout>
             <div className="text-center mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">Iniciar Sesión</h1>
-                <p className="text-gray-500 text-sm">Bienvenido al sistema de administración</p>
+                <h1 className="text-3xl font-black text-[#3D1A20] font-serif uppercase tracking-tight mb-2">Iniciar Sesión</h1>
+                <p className="text-[#3D1A20]/70 text-sm font-medium">Bienvenido al sistema de administración</p>
             </div>
 
             <Form {...form}>
@@ -80,11 +80,11 @@ const LoginCard = () => {
                         name="email"
                         render={({field}) => (
                             <FormItem>
-                                <FormLabel className="text-gray-700 font-semibold">Correo electrónico</FormLabel>
+                                <FormLabel className="text-[#3D1A20] font-bold text-xs uppercase tracking-wider">Correo electrónico</FormLabel>
                                 <FormControl>
                                     <Input 
                                         placeholder="tu@email.com" 
-                                        className="bg-gray-50 border-gray-200 text-gray-900 placeholder:text-gray-400 focus-visible:ring-[#0a47d4] focus-visible:border-[#0a47d4] rounded-xl px-4 py-3 h-auto" 
+                                        className="bg-[#F3ECE7] border-[#E5D8CC] text-[#3D1A20] placeholder:text-[#3D1A20]/40 focus-visible:ring-[#3D1A20] focus-visible:border-[#3D1A20] rounded-xl px-4 py-3 h-auto shadow-inner" 
                                         {...field} 
                                     />
                                 </FormControl>
@@ -97,12 +97,12 @@ const LoginCard = () => {
                         name="password"
                         render={({field}) => (
                             <FormItem>
-                                <FormLabel className="text-gray-700 font-semibold">Contraseña</FormLabel>
+                                <FormLabel className="text-[#3D1A20] font-bold text-xs uppercase tracking-wider">Contraseña</FormLabel>
                                 <FormControl>
                                     <Input 
                                         type="password" 
                                         placeholder="••••••••"
-                                        className="bg-gray-50 border-gray-200 text-gray-900 placeholder:text-gray-400 focus-visible:ring-[#0a47d4] focus-visible:border-[#0a47d4] rounded-xl px-4 py-3 h-auto" 
+                                        className="bg-[#F3ECE7] border-[#E5D8CC] text-[#3D1A20] placeholder:text-[#3D1A20]/40 focus-visible:ring-[#3D1A20] focus-visible:border-[#3D1A20] rounded-xl px-4 py-3 h-auto shadow-inner tracking-widest" 
                                         {...field} 
                                     />
                                 </FormControl>
@@ -111,13 +111,13 @@ const LoginCard = () => {
                         )}
                     />
 
-                    <Button type="submit" className="w-full bg-[#0a47d4] hover:bg-blue-700 text-white font-bold py-6 rounded-xl mt-4 transition-colors shadow-md shadow-blue-500/20" disabled={isLoading}>
-                        {isLoading ? <Loader2 className="animate-spin mr-2" size={20} /> : null}
+                    <Button type="submit" className="w-full bg-[#3D1A20] hover:bg-[#2E1318] text-[#F3ECE7] font-bold py-6 rounded-xl mt-4 transition-all shadow-xl hover:shadow-[#3D1A20]/30 hover:-translate-y-0.5 uppercase tracking-widest text-xs" disabled={isLoading}>
+                        {isLoading ? <Loader2 className="animate-spin mr-2" size={18} /> : null}
                         {isLoading ? "Iniciando..." : "Ingresar"}
                     </Button>
 
                     <div className="mt-6 text-center">
-                        <Button variant="link" type="button" className="text-gray-500 hover:text-[#0a47d4] font-medium" onClick={() => navigate("/signup")}>
+                        <Button variant="link" type="button" className="text-[#3D1A20]/70 hover:text-[#3D1A20] font-bold text-xs uppercase tracking-wider" onClick={() => navigate("/signup")}>
                             ¿No tienes una cuenta? Regístrate
                         </Button>
                     </div>

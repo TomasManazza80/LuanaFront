@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { logout } from '../../services/auth/authSlice.js';
 import { useLogoutMutation } from '../../services/api/authApi.js';
+import { motion } from 'framer-motion';
 
 export default function PublicNavbar() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -73,7 +74,12 @@ export default function PublicNavbar() {
 
     return (
         <>
-        <header className="w-full bg-[#3D1A20]/95 backdrop-blur-md text-[#E8DDD3] fixed top-0 left-0 right-0 z-[1000] shadow-md transition-all duration-300">
+        <motion.header 
+            initial={{ y: -100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="w-full bg-[#3D1A20]/95 backdrop-blur-md text-[#E8DDD3] fixed top-0 left-0 right-0 z-[1000] shadow-md transition-all duration-300"
+        >
             <div className="max-w-[1400px] mx-auto px-6 py-4 md:px-10 flex items-center justify-between">
                 
                 {/* Left: Mobile Menu Toggle & Monogram Logo */}
@@ -117,6 +123,12 @@ export default function PublicNavbar() {
                         className="hover:text-white transition-colors"
                     >
                         PEDICURE
+                    </button>
+                    <button 
+                        onClick={() => handleSectionClick('contacto')} 
+                        className="hover:text-white transition-colors"
+                    >
+                        CONTACTO
                     </button>
                     <button 
                         onClick={() => navigate('/productos')} 
@@ -201,7 +213,7 @@ export default function PublicNavbar() {
                     </div>
                 </div>
             </div>
-        </header>
+        </motion.header>
 
         {/* Mobile Navigation Drawer & Overlay */}
         <div 
@@ -243,6 +255,12 @@ export default function PublicNavbar() {
                     className="text-left font-semibold text-[#E8DDD3]/80 hover:text-white transition-colors"
                 >
                     PEDICURE
+                </button>
+                <button 
+                    onClick={() => handleSectionClick('contacto')} 
+                    className="text-left font-semibold text-[#E8DDD3]/80 hover:text-white transition-colors"
+                >
+                    CONTACTO
                 </button>
                 <button 
                     onClick={() => { setIsMobileMenuOpen(false); navigate('/productos'); }} 

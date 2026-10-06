@@ -415,13 +415,13 @@ export default function GestorHomeLive() {
   };
 
   const viewportWidths = {
-    desktop: 'w-full max-w-5xl mx-auto',
+    desktop: 'w-full max-w-full mx-auto border-0 rounded-none',
     tablet: 'w-full max-w-2xl mx-auto',
     mobile: 'w-full max-w-xs mx-auto'
   };
 
   return (
-    <div className="flex flex-col bg-slate-950 text-slate-100 font-sans w-full max-w-full h-full min-h-screen selection:bg-amber-400 selection:text-slate-950 overflow-x-hidden">
+    <div className="flex flex-col bg-slate-950 text-slate-100 font-sans w-full max-w-full min-h-screen selection:bg-amber-400 selection:text-slate-950 overflow-x-hidden">
 
       {/* 1. TOP HEADER CONTROL BAR (SaaS 2-Tier Modern Toolbar - High Density) */}
       <header className="bg-slate-900/95 backdrop-blur-md border-b border-slate-800/80 sticky top-0 z-50 shadow-lg w-full max-w-full overflow-x-hidden">
@@ -557,12 +557,12 @@ export default function GestorHomeLive() {
 
 
       {/* 2. MAIN WORKSPACE CONTAINER */}
-      <div className="flex-1 flex min-h-0 overflow-hidden relative bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-slate-950 w-full max-w-full overflow-x-hidden">
+      <div className="flex-1 flex relative bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-slate-950 w-full max-w-full overflow-x-hidden">
 
         {/* INTERACTIVE PREVIEW CANVAS CONTAINER */}
-        <main className="flex-1 p-2 sm:p-4 md:p-6 overflow-y-auto overflow-x-hidden flex justify-center items-start scroll-smooth w-full max-w-full">
+        <main className="flex-1 p-0 overflow-y-visible overflow-x-hidden flex justify-center items-start scroll-smooth w-full max-w-full">
           <div 
-            className={`transition-all duration-300 ${viewportWidths[viewport]} w-full max-w-full overflow-x-hidden bg-[#E5D8CC] text-[#3D1A20] rounded-2xl shadow-xl border border-slate-800 flex flex-col font-sans select-none relative origin-top my-2 shadow-black/80 ring-1 ring-white/10`}
+            className={`transition-all duration-300 ${viewportWidths[viewport]} overflow-x-hidden bg-[#E5D8CC] text-[#3D1A20] shadow-xl border border-slate-800 flex flex-col font-sans select-none relative origin-top shadow-black/80 ring-1 ring-white/10 ${viewport === 'desktop' ? 'rounded-none min-h-screen my-0' : 'rounded-2xl my-2'}`}
           >
 
             {/* Canvas Header Bar / Device Frame Header */}
@@ -582,7 +582,7 @@ export default function GestorHomeLive() {
             </div>
 
             {/* LIVE PREVIEW CANVAS BODY */}
-            <div className="flex-1 overflow-y-auto overflow-x-hidden space-y-0 w-full max-w-full">
+            <div className="flex-1 overflow-y-visible overflow-x-hidden space-y-0 w-full max-w-full">
 
               {/* 1. HERO PREVIEW SECTION */}
               <section
@@ -669,7 +669,7 @@ export default function GestorHomeLive() {
                         <div className="relative overflow-hidden rounded-[18px] sm:rounded-[30px] aspect-[9/19.5] bg-black border border-black/40 shadow-inner">
                           <video
                             key={content.hero?.phoneVideo || 'default'}
-                            src={content.hero?.phoneVideo || videoHero}
+                            src={content.hero?.phoneVideo || 'https://ik.imagekit.io/b5xsd4m00/home_gestor/media_1787090981826_VgNjaEOPn'}
                             autoPlay
                             loop
                             muted

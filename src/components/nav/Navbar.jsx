@@ -186,7 +186,7 @@ const Navbar = ({ children }) => {
                 </div>
 
                 {/* Sidebar Navigation Links */}
-                <nav className="flex-1 px-3 py-6 space-y-1.5 overflow-y-auto hide-scrollbar">
+                <nav className="flex-1 px-3 py-6 space-y-1.5 overflow-y-auto hide-scrollbar" data-lenis-prevent>
                     {navItems.map((item) => {
                         const Icon = item.icon;
                         const currentTab = new URLSearchParams(location.search).get('tab');
@@ -381,7 +381,7 @@ const Navbar = ({ children }) => {
                 </div>
 
                 {/* 3. MAIN PAGE CONTENT */}
-                <main className="flex-1 overflow-x-hidden overflow-y-auto bg-[#F8FAFC]">
+                <main className="flex-1 overflow-x-hidden overflow-y-auto bg-[#F8FAFC]" id="admin-main-scroll" data-lenis-prevent>
                     <div className="min-h-full w-full">
                         {children}
                     </div>

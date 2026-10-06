@@ -11,6 +11,7 @@ import {TooltipProvider} from "./components/ui/tooltip.tsx";
 import {useSocket} from "./services/hooks/useSocket.js";
 import SocketContext from "./services/contexts/SocketContext.js";
 import {ThemeProvider} from "./services/contexts/ThemeContext.tsx";
+import SmoothScroll from "./components/ui/SmoothScroll.jsx";
 import BookingPage from "./pages/public/BookingPage.jsx";
 import MyAppointments from "./components/kinesio/MyAppointments.jsx";
 import Products from "./pages/Products/index.jsx";
@@ -35,6 +36,7 @@ import UserProfile from "./components/profile/UserProfile.jsx";
 
 function App() {
     return (
+        <SmoothScroll>
         <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
             <Provider store={store}>
                 <Router>
@@ -43,11 +45,14 @@ function App() {
                 <AuthVerify/>
             </Provider>
         </ThemeProvider>
+        </SmoothScroll>
     )
 }
 
 import { useState, useEffect } from "react";
 import Loader from "./components/public/Loader.jsx";
+import { AnimatePresence } from "framer-motion";
+import PageTransition from "./components/ui/PageTransition.jsx";
 
 const AppContent = () => {
     const location = useLocation();
@@ -70,38 +75,42 @@ const AppContent = () => {
         <SocketContext.Provider value={socket}>
             <TooltipProvider>
                 {showNavbar && (<Navbar>
-                    <Routes>
-                        <Route path="*" element={<NotFound/>} />
-                        <Route path="/dashboard" element={<Dashboard/>} />
-                        <Route path="/turnos" element={<AppointmentCalendar/>} />
-                        <Route path="/pacientes" element={<PatientList/>} />
-                        <Route path="/pacientes/:id" element={<PatientProfile/>} />
-                        <Route path="/balance" element={<FinancialOverview/>} />
-                        <Route path="/tareas" element={<TaskList/>} />
-                        <Route path="/disponibilidad" element={<AvailabilityManager/>} />
-                        <Route path="/profesionales" element={<ProfessionalList/>} />
-                        <Route path="/historial/:id?" element={<MedicalHistoryTimeline/>} />
-                        <Route path="/historial-turnos" element={<AppointmentHistory/>} />
-                        <Route path="/perfil" element={<UserProfile/>} />
-                        <Route path="/inventario" element={<ProductInventory/>} />
+                    <AnimatePresence mode="wait">
+                    <Routes location={location} key={location.pathname}>
+                        <Route path="*" element={<PageTransition><NotFound/></PageTransition>} />
+                        <Route path="/dashboard" element={<PageTransition><Dashboard/></PageTransition>} />
+                        <Route path="/turnos" element={<PageTransition><AppointmentCalendar/></PageTransition>} />
+                        <Route path="/pacientes" element={<PageTransition><PatientList/></PageTransition>} />
+                        <Route path="/pacientes/:id" element={<PageTransition><PatientProfile/></PageTransition>} />
+                        <Route path="/balance" element={<PageTransition><FinancialOverview/></PageTransition>} />
+                        <Route path="/tareas" element={<PageTransition><TaskList/></PageTransition>} />
+                        <Route path="/disponibilidad" element={<PageTransition><AvailabilityManager/></PageTransition>} />
+                        <Route path="/profesionales" element={<PageTransition><ProfessionalList/></PageTransition>} />
+                        <Route path="/historial/:id?" element={<PageTransition><MedicalHistoryTimeline/></PageTransition>} />
+                        <Route path="/historial-turnos" element={<PageTransition><AppointmentHistory/></PageTransition>} />
+                        <Route path="/perfil" element={<PageTransition><UserProfile/></PageTransition>} />
+                        <Route path="/inventario" element={<PageTransition><ProductInventory/></PageTransition>} />
                     </Routes>
+                    </AnimatePresence>
                 </Navbar>)}
                 {!showNavbar && (
-                    <Routes>
-                        <Route path="/" element={<HOME/>} />
-                        <Route path="/login" element={<LoginCard/>} />
-                        <Route path="/signup" element={<SignUpCard/>}/>
-                        <Route path="/signup-admin" element={<SignUpAdminCard/>}/>
-                        <Route path="/reservar" element={<BookingPage/>} />
-                        <Route path="/mis-turnos" element={<MyAppointments/>} />
-                        <Route path="/mis-cursos" element={<MisCursos/>} />
-                        <Route path="/productos" element={<Products/>} />
-                        <Route path="/productos/*" element={<Products/>} />
-                        <Route path="/product/:id" element={<ProductDetails/>} />
-                        <Route path="/producto/:id" element={<ProductDetails/>} />
-                        <Route path="/curso/:id" element={<CourseDetails/>} />
-                        <Route path="/cart" element={<Cart/>} />
+                    <AnimatePresence mode="wait">
+                    <Routes location={location} key={location.pathname}>
+                        <Route path="/" element={<PageTransition><HOME/></PageTransition>} />
+                        <Route path="/login" element={<PageTransition><LoginCard/></PageTransition>} />
+                        <Route path="/signup" element={<PageTransition><SignUpCard/></PageTransition>}/>
+                        <Route path="/signup-admin" element={<PageTransition><SignUpAdminCard/></PageTransition>}/>
+                        <Route path="/reservar" element={<PageTransition><BookingPage/></PageTransition>} />
+                        <Route path="/mis-turnos" element={<PageTransition><MyAppointments/></PageTransition>} />
+                        <Route path="/mis-cursos" element={<PageTransition><MisCursos/></PageTransition>} />
+                        <Route path="/productos" element={<PageTransition><Products/></PageTransition>} />
+                        <Route path="/productos/*" element={<PageTransition><Products/></PageTransition>} />
+                        <Route path="/product/:id" element={<PageTransition><ProductDetails/></PageTransition>} />
+                        <Route path="/producto/:id" element={<PageTransition><ProductDetails/></PageTransition>} />
+                        <Route path="/curso/:id" element={<PageTransition><CourseDetails/></PageTransition>} />
+                        <Route path="/cart" element={<PageTransition><Cart/></PageTransition>} />
                     </Routes>
+                    </AnimatePresence>
                 )}
 
                 {/* Floating WhatsApp Button */}

@@ -424,7 +424,7 @@ const HOME = () => {
                   {/* Video Player */}
                   <video
                     key={homeContent?.hero?.phoneVideo || 'default-phone'}
-                    src={homeContent?.hero?.phoneVideo || defaultVideoHero}
+                    src={homeContent?.hero?.phoneVideo || 'https://ik.imagekit.io/b5xsd4m00/home_gestor/media_1787090981826_VgNjaEOPn'}
                     autoPlay
                     loop
                     muted
@@ -940,6 +940,38 @@ const HOME = () => {
             </div>
           )}
 
+        </div>
+      </section>
+
+      {/* SECCIÓN CONTACTO */}
+      <section id="contacto" className="w-full py-14 md:py-20 px-6 sm:px-12 bg-[#3D1A20] text-[#F3ECE7] border-t border-[#F3ECE7]/10">
+        <div className="max-w-4xl mx-auto text-center space-y-8">
+          <div>
+            <h2 className="text-2xl md:text-4xl font-bold uppercase tracking-wider text-[#F3ECE7] inline-flex items-center gap-1">
+              CONTACTO
+            </h2>
+            <p className="text-xs md:text-sm text-[#E8DDD3]/80 font-medium mt-2 uppercase tracking-wide">
+              Escribinos o visitanos en nuestras redes sociales
+            </p>
+          </div>
+          
+          <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16 pt-6">
+            <div className="flex flex-col items-center gap-3">
+              <div className="w-12 h-12 rounded-full bg-[#E8DDD3]/10 flex items-center justify-center border border-[#E8DDD3]/20">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              </div>
+              <span className="text-sm md:text-base font-bold uppercase tracking-widest text-[#F3ECE7]">3424 41-7939</span>
+              <a href="https://wa.me/5493424417939" target="_blank" rel="noopener noreferrer" className="text-[10px] uppercase font-bold tracking-widest text-[#3D1A20] bg-[#F3ECE7] px-5 py-2 rounded-full hover:bg-white transition-colors shadow-md">Enviar WhatsApp</a>
+            </div>
+
+            <div className="flex flex-col items-center gap-3">
+              <div className="w-12 h-12 rounded-full bg-[#E8DDD3]/10 flex items-center justify-center border border-[#E8DDD3]/20">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+              </div>
+              <span className="text-sm md:text-base font-bold uppercase tracking-widest text-[#F3ECE7]">@_luan.studio</span>
+              <a href="https://instagram.com/_luan.studio" target="_blank" rel="noopener noreferrer" className="text-[10px] uppercase font-bold tracking-widest text-[#3D1A20] bg-[#F3ECE7] px-5 py-2 rounded-full hover:bg-white transition-colors shadow-md">Ver Instagram</a>
+            </div>
+          </div>
         </div>
       </section>
 

@@ -151,7 +151,7 @@ export default function PublicNavbar() {
                     
                     {userInfo?.role?.toUpperCase() === 'ADMIN' || userInfo?.role?.toUpperCase() === 'EMPLOYEE' ? (
                         <button 
-                            onClick={() => navigate('/dashboard')}
+                            onClick={() => navigate('/turnos')}
                             className="text-[#3D1A20] font-bold bg-[#E8DDD3] px-3.5 py-1.5 rounded-full hover:bg-white transition-colors text-[10px] tracking-wider"
                         >
                             PANEL ADMIN
@@ -283,7 +283,7 @@ export default function PublicNavbar() {
                 
                 {userInfo?.role?.toUpperCase() === 'ADMIN' || userInfo?.role?.toUpperCase() === 'EMPLOYEE' ? (
                     <button 
-                        onClick={() => { setIsMobileMenuOpen(false); navigate('/dashboard'); }}
+                        onClick={() => { setIsMobileMenuOpen(false); navigate('/turnos'); }}
                         className="text-left font-bold text-[#E8DDD3] transition-colors"
                     >
                         PANEL ADMIN

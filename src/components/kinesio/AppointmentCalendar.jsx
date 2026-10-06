@@ -91,6 +91,8 @@ const AppointmentCalendar = () => {
         }
     }, [profileData]);
 
+    const [hasNotified, setHasNotified] = useState(false);
+
     const { data: patientsData } = useGetPatientsQuery();
     const patients = patientsData || [];
 
@@ -177,6 +179,41 @@ const AppointmentCalendar = () => {
     }, {
         skip: !activeProfessionalId
     });
+
+    React.useEffect(() => {
+        if (appointments && !hasNotified && user && ['ADMIN', 'EMPLOYEE'].includes(user?.role?.toUpperCase())) {
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+
+            const todaysAppts = appointments.filter(a => {
+                if (a.estado === 'cancelado' || a.estado === 'completado') return false;
+                const d = parseDateString(a.fecha_hora);
+                return d >= today && d < tomorrow;
+            });
+
+            if (todaysAppts.length > 0) {
+                const apptList = todaysAppts.slice(0, 5).map(a => 
+                    `• ${a.patient?.nombre || 'Cliente'} - ${parseDateString(a.fecha_hora).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} hs`
+                ).join('\n');
+                const extra = todaysAppts.length > 5 ? `\n... y ${todaysAppts.length - 5} más` : '';
+
+                toast({
+                    title: `🔔 ¡Tienes ${todaysAppts.length} turnos para hoy!`,
+                    description: apptList + extra,
+                    duration: 8000
+                });
+            } else {
+                toast({
+                    title: '✅ Agenda Libre',
+                    description: 'No tienes turnos programados para el día de hoy.',
+                    duration: 5000
+                });
+            }
+            setHasNotified(true);
+        }
+    }, [appointments, hasNotified, user]);
 
     const displayDays = viewMode === 'Semanal'
         ? Array.from({ length: 7 }, (_, i) => {

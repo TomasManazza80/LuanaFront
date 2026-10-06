@@ -20,7 +20,7 @@ const LoginCard = () => {
         if (accessToken) {
             const role = (user?.role || '').toUpperCase();
             if (role === 'ADMIN' || role === 'EMPLOYEE') {
-                navigate('/dashboard');
+                navigate('/turnos');
             } else {
                 navigate('/reservar');
             }
@@ -56,7 +56,7 @@ const LoginCard = () => {
                 }
 
                 if (role === 'ADMIN' || role === 'EMPLOYEE') {
-                    navigate('/dashboard')
+                    navigate('/turnos')
                 } else {
                     navigate('/reservar')
                 }

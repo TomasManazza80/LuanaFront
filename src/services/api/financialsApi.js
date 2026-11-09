@@ -5,6 +5,7 @@ import {toast} from "../../components/ui/use-toast.tsx";
 export const financialsApi = authApi.injectEndpoints({
     reducerPath: 'financialsApi',
     baseQuery: customFetchBase,
+    overrideExisting: true,
     endpoints: (build) => ({
         getPaymentSchedule: build.query({
             query: (id) => ({

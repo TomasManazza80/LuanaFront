@@ -5,6 +5,7 @@ import { toast } from "../../components/ui/use-toast";
 export const kinesioApi = authApi.injectEndpoints({
     reducerPath: 'kinesioApi',
     baseQuery: customFetchBase,
+    overrideExisting: true,
     endpoints: (build) => ({
         getProfessionals: build.query({
             query: () => ({

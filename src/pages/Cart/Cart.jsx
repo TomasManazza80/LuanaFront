@@ -21,7 +21,8 @@ const slideUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, tr
 const itemAnimation = { hidden: { opacity: 0, y: 15 }, visible: { opacity: 1, y: 0, transition: { duration: 0.3 } } };
 
 function Cart() {
-  const cart = useSelector((state) => state.cart);
+  const cartState = useSelector((state) => state.cart);
+  const cart = Array.isArray(cartState) ? cartState : (Array.isArray(cartState?.cart) ? cartState.cart : []);
   const dispatch = useDispatch();
 
   const [name, setName] = useState("");

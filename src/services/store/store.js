@@ -32,6 +32,7 @@ import {
 import { configureStore } from '@reduxjs/toolkit/react'
 import {eventsReducer} from "../slices/eventSlice.js";
 import {messagesReducer} from "../slices/messageSlice.js";
+import { CartReducer } from "../../store/redux/cart/CartReducer.js";
 
 
 export const store = configureStore({
@@ -39,6 +40,7 @@ export const store = configureStore({
         [authApi.reducerPath]: authApi.reducer,
         authSlice: authSlice,
         userSlice: userSlice,
+        cart: CartReducer,
         properties: propertiesReducer,
         units: unitsReducer,
         leases: leasesReducer,

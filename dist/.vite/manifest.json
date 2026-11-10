@@ -1,6 +1,6 @@
 {
   "index.html": {
-    "file": "assets/index-DoxvIXBr.js",
+    "file": "assets/index-PJi3-Iyo.js",
     "name": "index",
     "src": "index.html",
     "isEntry": true,
@@ -28,7 +28,7 @@
     "src": "node_modules/@fontsource-variable/outfit/files/outfit-latin-wght-normal.woff2"
   },
   "node_modules/canvg/lib/index.es.js": {
-    "file": "assets/index.es-GS3x-Hlu.js",
+    "file": "assets/index.es-CVpHL9fj.js",
     "name": "index.es",
     "src": "node_modules/canvg/lib/index.es.js",
     "isDynamicEntry": true,

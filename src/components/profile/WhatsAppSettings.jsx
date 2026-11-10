@@ -24,24 +24,32 @@ const WhatsAppSettings = ({ profId }) => {
     useEffect(() => {
         if (data) {
             setStatus(data.status);
+            if (data.qr) setQr(data.qr);
+            if (data.status === 'connected') setQr(null);
+
+            const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:10000';
+            const socket = io(backendUrl, {
+                reconnectionAttempts: 10,
+                reconnectionDelay: 2000
+            });
+
+            const handleStatus = (newStatus) => {
+                setStatus(newStatus);
+                if (newStatus === 'connected') setQr(null);
+            };
+
+            const handleQr = (newQr) => {
+                setQr(newQr);
+            };
+
+            socket.on('whatsapp-status', handleStatus);
+            socket.on('whatsapp-qr', handleQr);
             if (data.profId) {
-                const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:10000';
-                const socket = io(backendUrl, {
-                    reconnectionAttempts: 10,
-                    reconnectionDelay: 2000
-                });
-
-                socket.on(`whatsapp-status`, (newStatus) => {
-                    setStatus(newStatus);
-                    if (newStatus === 'connected') setQr(null);
-                });
-
-                socket.on(`whatsapp-qr`, (newQr) => {
-                    setQr(newQr);
-                });
-
-                return () => socket.disconnect();
+                socket.on(`status-${data.profId}`, handleStatus);
+                socket.on(`qr-${data.profId}`, handleQr);
             }
+
+            return () => socket.disconnect();
         }
     }, [data]);
 

@@ -994,7 +994,7 @@ const HOME = () => {
               </button>
               {homeContent.footerBanner.whatsappText && (
                 <a
-                  href="https://wa.me/5493425547811"
+                  href="https://wa.me/5493424417939"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-xs text-[#E8DDD3] underline hover:text-white font-semibold tracking-wider"

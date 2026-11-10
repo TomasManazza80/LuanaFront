@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { Clock, Plus, CalendarX, X, ChevronLeft, ChevronRight, Trash2, AlertTriangle } from 'lucide-react';
+import { Clock, Plus, CalendarX, X, ChevronLeft, ChevronRight, Trash2, AlertTriangle, CreditCard, DollarSign, CheckCircle } from 'lucide-react';
 import { useGetAvailabilityQuery, useSaveAvailabilityMutation, useGetProfessionalsQuery, useUpdateProfessionalMutation } from '../../services/api/kinesioApi.js';
 import { toast } from '../ui/use-toast';
 import WhatsAppSettings from '../profile/WhatsAppSettings.jsx';
@@ -36,18 +36,20 @@ const AvailabilityManager = () => {
     const [newExceptionDate, setNewExceptionDate] = useState('');
     const [newExceptionEndDate, setNewExceptionEndDate] = useState('');
     const [newExceptionTitle, setNewExceptionTitle] = useState('');
-    const [appointmentCost, setAppointmentCost] = useState('');
-    const [requirePayment, setRequirePayment] = useState(false);
+    const [requiresDeposit, setRequiresDeposit] = useState(false);
+    const [depositAmount, setDepositAmount] = useState('');
+    const [paymentTimeoutMinutes, setPaymentTimeoutMinutes] = useState(15);
+    const [applyGlobally, setApplyGlobally] = useState(false);
     const [showDisconnectModal, setShowDisconnectModal] = useState(false);
-    const [sessionFee, setSessionFee] = useState('');
     const [mpAccessToken, setMpAccessToken] = useState('');
     const [mpAuthUrl, setMpAuthUrl] = useState('');
 
     useEffect(() => {
         if (myProfileData) {
-            const fee = Number(myProfileData.session_fee);
-            setSessionFee(fee === 0 || isNaN(fee) ? '' : fee.toString());
-            setRequirePayment(!!myProfileData.require_payment);
+            const rawAmount = Number(myProfileData.deposit_amount || myProfileData.session_fee);
+            setDepositAmount(rawAmount === 0 || isNaN(rawAmount) ? '' : rawAmount.toString());
+            setRequiresDeposit(Boolean(myProfileData.requires_deposit ?? myProfileData.require_payment ?? false));
+            setPaymentTimeoutMinutes(Number(myProfileData.payment_timeout_minutes) || 15);
             setMpAccessToken(myProfileData.mp_access_token || '');
         }
     }, [myProfileData]);
@@ -255,14 +257,19 @@ const AvailabilityManager = () => {
         try {
             await saveAvailability({ schedules: payloadSchedules, exceptions, professional_id: myProfId }).unwrap();
             
+            const numAmount = depositAmount === '' ? 0 : Number(depositAmount);
             const feePayload = { 
-                session_fee: sessionFee === '' ? 0 : Number(sessionFee),
-                require_payment: requirePayment
+                requires_deposit: Boolean(requiresDeposit),
+                require_payment: Boolean(requiresDeposit),
+                deposit_amount: numAmount,
+                session_fee: numAmount,
+                payment_timeout_minutes: Number(paymentTimeoutMinutes) || 15,
+                apply_deposit_globally: applyGlobally
             };
 
             await updateProfessional({ id: myProfId, ...feePayload }).unwrap();
             
-            toast({ title: 'Éxito', description: 'Configuración guardada correctamente', variant: 'success' });
+            toast({ title: 'Éxito', description: 'Disponibilidad y cobro de turnos guardados correctamente', variant: 'success' });
         } catch (error) {
             toast({ title: 'Error', description: 'No se pudo guardar la configuración', variant: 'error' });
         }
@@ -368,7 +375,100 @@ const AvailabilityManager = () => {
 
                     </div>
 
+                    {/* Cobro de Seña Obligatoria (Mercado Pago Checkout Pro) */}
+                    <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm flex flex-col gap-4">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2 text-[#009EE3] font-bold text-lg">
+                                <CreditCard size={20} strokeWidth={2.5} />
+                                <h2>Cobro de Turno / Seña</h2>
+                            </div>
+                            <span className="text-[11px] font-bold uppercase tracking-wider bg-sky-50 text-[#009EE3] border border-sky-100 px-2.5 py-1 rounded-full flex items-center gap-1.5">
+                                <span className="w-2 h-2 rounded-full bg-[#009EE3] animate-pulse"></span>
+                                Mercado Pago
+                            </span>
+                        </div>
 
+                        <p className="text-xs text-gray-500 leading-relaxed">
+                            Configura si los pacientes deben abonar una seña previa o el costo del turno mediante Mercado Pago Checkout Pro para poder reservar desde la web.
+                        </p>
+
+                        {/* Toggle Switch */}
+                        <div className="p-4 rounded-xl border border-gray-100 bg-gray-50/70 flex items-center justify-between gap-3">
+                            <div>
+                                <p className="text-sm font-bold text-gray-900">Cobro obligatorio para confirmar turno</p>
+                                <p className="text-xs text-gray-500 mt-0.5">
+                                    {requiresDeposit 
+                                        ? 'Activo: se requerirá el pago por Mercado Pago para validar el turno.' 
+                                        : 'Inactivo: los turnos se reservan directamente sin cobro previo.'}
+                                </p>
+                            </div>
+                            <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                                <input
+                                    type="checkbox"
+                                    checked={requiresDeposit}
+                                    onChange={(e) => setRequiresDeposit(e.target.checked)}
+                                    className="sr-only peer"
+                                />
+                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#009EE3]"></div>
+                            </label>
+                        </div>
+
+                        {requiresDeposit && (
+                            <div className="flex flex-col gap-4 pt-1 animate-in fade-in duration-300">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="block text-xs font-bold text-gray-700 mb-1">
+                                            Monto a abonar ($ ARS) *
+                                        </label>
+                                        <div className="relative">
+                                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm">$</span>
+                                            <input
+                                                type="number"
+                                                min="1"
+                                                step="100"
+                                                placeholder="Ej. 5000"
+                                                value={depositAmount}
+                                                onChange={(e) => setDepositAmount(e.target.value)}
+                                                className="w-full pl-8 pr-3 py-2 text-sm font-semibold text-gray-800 bg-white border border-gray-200 rounded-xl outline-none focus:border-[#009EE3] focus:ring-2 focus:ring-sky-100 transition-all"
+                                                required={requiresDeposit}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-xs font-bold text-gray-700 mb-1">
+                                            Tiempo límite (minutos)
+                                        </label>
+                                        <input
+                                            type="number"
+                                            min="5"
+                                            max="120"
+                                            value={paymentTimeoutMinutes}
+                                            onChange={(e) => setPaymentTimeoutMinutes(parseInt(e.target.value) || 15)}
+                                            className="w-full px-3 py-2 text-sm font-semibold text-gray-800 bg-white border border-gray-200 rounded-xl outline-none focus:border-[#009EE3] focus:ring-2 focus:ring-sky-100 transition-all text-center"
+                                            title="Tiempo de retención del horario en minutos"
+                                        />
+                                    </div>
+                                </div>
+
+                                <p className="text-[11px] text-gray-400 leading-tight">
+                                    El horario quedará retenido durante {paymentTimeoutMinutes || 15} minutos mientras el usuario paga en Checkout Pro. Si no abona en ese plazo, el turno expira y el horario se libera automáticamente.
+                                </p>
+
+                                {(userInfo?.role === 'ADMIN' || userInfo?.role === 'admin') && (
+                                    <label className="flex items-center gap-2 pt-2 border-t border-gray-100 text-xs font-bold text-gray-700 cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={applyGlobally}
+                                            onChange={(e) => setApplyGlobally(e.target.checked)}
+                                            className="w-4 h-4 text-[#009EE3] rounded border-gray-300 focus:ring-[#009EE3]"
+                                        />
+                                        Aplicar esta configuración de seña a todos los profesionales
+                                    </label>
+                                )}
+                            </div>
+                        )}
+                    </div>
 
                     <button
                         onClick={handleSave}

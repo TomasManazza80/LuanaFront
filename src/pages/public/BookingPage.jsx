@@ -75,6 +75,9 @@ export default function BookingPage() {
     const { data: profData, isLoading: isLoadingProfs } = useGetPublicProfessionalsQuery();
     const professionals = profData?.data || [];
     const selectedSpecialist = professionals.find(p => p.id === selectedSpecialistId);
+    const requiresDeposit = Boolean(selectedSpecialist?.requires_deposit ?? selectedSpecialist?.require_payment ?? false);
+    const depositAmount = Number(selectedSpecialist?.deposit_amount || selectedSpecialist?.session_fee || 0);
+    const hasDeposit = requiresDeposit && depositAmount > 0;
 
     const { data: slotsData, isLoading: isLoadingSlots, isFetching: isFetchingSlots } = useGetAvailableSlotsQuery(
         { professional_id: selectedSpecialistId, date: selectedDate?.date, service: selectedService },
@@ -406,11 +409,11 @@ export default function BookingPage() {
                                             )}
                                         </div>
                                         <div className="flex-1 w-full">
-                                            <div className="inline-block px-3 py-1 bg-gray-800 rounded-full text-xs font-bold uppercase tracking-widest text-gray-300 mb-3 border border-gray-700">
+                                            <div className="inline-block px-3 py-1 bg-gray-800 rounded-full text-xs font-bold uppercase tracking-widest text-gray-200 mb-3 border border-gray-700">
                                                 {selectedService}
                                             </div>
-                                            <h3 className="text-2xl md:text-3xl font-extrabold mb-1">{selectedSpecialist?.name || 'Especialista'}</h3>
-                                            <p className="text-gray-400 text-sm mb-6 pb-6 border-b border-gray-800">
+                                            <h3 className="text-2xl md:text-3xl font-extrabold mb-1 text-white">{selectedSpecialist?.name || 'Especialista'}</h3>
+                                            <p className="text-gray-200 text-sm mb-6 pb-6 border-b border-gray-800">
                                                 {Array.isArray(selectedSpecialist?.specialty) ? selectedSpecialist?.specialty.join(', ') : selectedSpecialist?.specialty}
                                             </p>
                                             
@@ -433,16 +436,16 @@ export default function BookingPage() {
                                                 </div>
                                             </div>
 
-                                            {selectedSpecialist?.requires_deposit && Number(selectedSpecialist?.deposit_amount) > 0 && (
+                                            {hasDeposit && (
                                                 <div className="mt-4 bg-blue-500/15 border border-blue-400/30 rounded-2xl p-4 text-left">
                                                     <div className="flex items-center justify-between mb-1">
                                                         <span className="text-xs font-bold uppercase tracking-wider text-blue-300">Seña obligatoria para confirmar</span>
                                                         <span className="text-lg font-extrabold text-white">
-                                                            ${Number(selectedSpecialist.deposit_amount).toLocaleString('es-AR')} ARS
+                                                            ${depositAmount.toLocaleString('es-AR')} ARS
                                                         </span>
                                                     </div>
                                                     <p className="text-xs text-gray-300">
-                                                        Al continuar serás redirigido a Mercado Pago. Tu horario quedará reservado temporalmente por {selectedSpecialist.payment_timeout_minutes || 15} minutos hasta completar el pago.
+                                                        Al continuar serás redirigido a Mercado Pago. Tu horario quedará reservado temporalmente por {selectedSpecialist?.payment_timeout_minutes || 15} minutos hasta completar el pago.
                                                     </p>
                                                 </div>
                                             )}
@@ -556,14 +559,14 @@ export default function BookingPage() {
                                         </div>
                                     </div>
                                     
-                                    {selectedSpecialist?.requires_deposit && Number(selectedSpecialist?.deposit_amount) > 0 && (
+                                    {hasDeposit && (
                                         <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl flex items-center justify-between">
                                             <div>
                                                 <p className="text-xs font-bold text-blue-900 uppercase tracking-wider">Monto de Seña a Abonar</p>
                                                 <p className="text-xs text-blue-700">Pago seguro vía Mercado Pago Checkout Pro</p>
                                             </div>
                                             <span className="text-lg font-extrabold text-blue-900">
-                                                ${Number(selectedSpecialist.deposit_amount).toLocaleString('es-AR')} ARS
+                                                ${depositAmount.toLocaleString('es-AR')} ARS
                                             </span>
                                         </div>
                                     )}
@@ -583,8 +586,8 @@ export default function BookingPage() {
                                         >
                                             {isCreating ? (
                                                 <Loader2 className="animate-spin w-5 h-5"/>
-                                            ) : selectedSpecialist?.requires_deposit && Number(selectedSpecialist?.deposit_amount) > 0 ? (
-                                                `Pagar Seña ($${Number(selectedSpecialist.deposit_amount).toLocaleString('es-AR')})`
+                                            ) : hasDeposit ? (
+                                                `Pagar Seña ($${depositAmount.toLocaleString('es-AR')})`
                                             ) : (
                                                 'Finalizar Reserva'
                                             )}

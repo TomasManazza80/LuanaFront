@@ -27,8 +27,14 @@ const AppointmentHistory = () => {
             const matchesSearch = appt.patient?.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) || 
                                   appt.patient?.apellido?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                                   appt.motivo?.toLowerCase().includes(searchTerm.toLowerCase());
-            const matchesStatus = statusFilter === 'ALL' || appt.estado === statusFilter;
-            return matchesSearch && matchesStatus;
+            if (statusFilter === 'ALL') return matchesSearch;
+            const st = (appt.estado || '').toUpperCase();
+            if (statusFilter === 'CONFIRMED') return matchesSearch && ['CONFIRMED', 'CONFIRMADO', 'PENDIENTE'].includes(st);
+            if (statusFilter === 'PENDING_PAYMENT') return matchesSearch && ['PENDING_PAYMENT', 'PENDIENTE_PAGO'].includes(st);
+            if (statusFilter === 'CANCELLED') return matchesSearch && ['CANCELLED', 'CANCELADO'].includes(st);
+            if (statusFilter === 'EXPIRED') return matchesSearch && ['EXPIRED', 'EXPIRADO'].includes(st);
+            if (statusFilter === 'COMPLETADO') return matchesSearch && ['COMPLETADO', 'COMPLETED'].includes(st);
+            return matchesSearch && appt.estado === statusFilter;
         }).sort((a, b) => new Date(b.fecha_hora) - new Date(a.fecha_hora)); // Sort descending by date
     }, [appointments, searchTerm, statusFilter]);
 
@@ -39,31 +45,57 @@ const AppointmentHistory = () => {
 
     const totalPages = Math.ceil(filteredAppointments.length / itemsPerPage);
 
-    const getStatusColor = (status) => {
-        switch (status?.toLowerCase()) {
-            case 'pending':
-            case 'pendiente': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+    const getStatusColor = (appt) => {
+        const status = (appt?.estado || '').toLowerCase();
+        const hasDeposit = Number(appt?.deposit_amount_paid) > 0 || Boolean(appt?.mp_payment_id || appt?.payment_id);
+        switch (status) {
+            case 'pending_payment':
+            case 'pendiente_pago':
+                return 'bg-amber-100 text-amber-800 border-amber-300';
             case 'confirmed':
-            case 'confirmado': return 'bg-blue-100 text-blue-800 border-blue-200';
+            case 'confirmado':
+            case 'pending':
+            case 'pendiente':
+                return hasDeposit
+                    ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
+                    : 'bg-blue-100 text-blue-800 border-blue-200';
             case 'completed':
-            case 'completado': return 'bg-green-100 text-green-800 border-green-200';
+            case 'completado':
+                return 'bg-green-100 text-green-800 border-green-200';
+            case 'expired':
+            case 'expirado':
+                return 'bg-gray-100 text-gray-600 border-gray-300';
             case 'cancelled':
-            case 'cancelado': return 'bg-red-100 text-red-800 border-red-200';
-            default: return 'bg-gray-100 text-gray-800 border-gray-200';
+            case 'cancelado':
+                return 'bg-red-100 text-red-800 border-red-200';
+            default:
+                return 'bg-gray-100 text-gray-800 border-gray-200';
         }
     };
 
-    const translateStatus = (status) => {
-        switch (status?.toLowerCase()) {
-            case 'pending':
-            case 'pendiente': return 'Pendiente';
+    const translateStatus = (appt) => {
+        const status = (appt?.estado || '').toLowerCase();
+        const hasDeposit = Number(appt?.deposit_amount_paid) > 0 || Boolean(appt?.mp_payment_id || appt?.payment_id);
+        switch (status) {
+            case 'pending_payment':
+            case 'pendiente_pago':
+                return 'Pendiente de pago';
             case 'confirmed':
-            case 'confirmado': return 'Confirmado';
+            case 'confirmado':
+            case 'pending':
+            case 'pendiente':
+                return hasDeposit ? 'Confirmado (Señado)' : 'Confirmado';
             case 'completed':
-            case 'completado': return 'Completado';
+            case 'completado':
+                return 'Completado';
+            case 'expired':
+            case 'expirado':
+                return 'Expirado';
             case 'cancelled':
-            case 'cancelado': return 'Cancelado';
-            default: return status;
+            case 'cancelado':
+                return 'Cancelado';
+            default:
+                return appt?.estado;
         }
     };
 
@@ -144,10 +176,11 @@ const AppointmentHistory = () => {
                                 className="bg-transparent outline-none text-gray-700 cursor-pointer"
                             >
                                 <option value="ALL">Todos los Estados</option>
-                                <option value="pendiente">Pendientes</option>
-                                <option value="confirmado">Confirmados</option>
-                                <option value="completado">Completados</option>
-                                <option value="cancelado">Cancelados</option>
+                                <option value="CONFIRMED">Confirmados</option>
+                                <option value="PENDING_PAYMENT">Pendientes de Pago</option>
+                                <option value="COMPLETADO">Completados</option>
+                                <option value="EXPIRED">Expirados</option>
+                                <option value="CANCELLED">Cancelados</option>
                             </select>
                         </div>
                     </div>
@@ -227,9 +260,14 @@ const AppointmentHistory = () => {
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <span className={`px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full border ${getStatusColor(appt.estado)}`}>
-                                                {translateStatus(appt.estado)}
+                                            <span className={`px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full border ${getStatusColor(appt)}`}>
+                                                {translateStatus(appt)}
                                             </span>
+                                            {Number(appt.deposit_amount_paid) > 0 && (
+                                                <div className="text-[11px] font-bold text-emerald-700 mt-1">
+                                                    Seña: ${Number(appt.deposit_amount_paid).toLocaleString('es-AR')}
+                                                </div>
+                                            )}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                             <div className="flex items-center justify-end gap-2">
@@ -325,10 +363,11 @@ const AppointmentHistory = () => {
                                     onChange={e => setEditingAppt({...editingAppt, estado: e.target.value})}
                                     className="w-full p-3 bg-white border border-gray-300 rounded-xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all font-medium"
                                 >
-                                    <option value="pendiente">Pendiente</option>
-                                    <option value="confirmado">Confirmado</option>
+                                    <option value="CONFIRMED">Confirmado</option>
+                                    <option value="PENDING_PAYMENT">Pendiente de Pago</option>
                                     <option value="completado">Completado</option>
-                                    <option value="cancelado">Cancelado</option>
+                                    <option value="EXPIRED">Expirado</option>
+                                    <option value="CANCELLED">Cancelado</option>
                                 </select>
                             </div>
 

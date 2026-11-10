@@ -7,11 +7,14 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {Button} from "../ui/button.tsx";
 import {useNavigate} from "react-router-dom";
 import PublicAuthLayout from "./PublicAuthLayout.jsx";
+import { Eye, EyeOff } from "lucide-react";
+import { useState } from "react";
 
 export const SignUpAdminCard = () => {
     const navigate = useNavigate();
     const [register, {isLoading}] = useRegisterMutation();
     const [login, {isLoading: loginIsLoading }] = useLoginMutation();
+    const [showPassword, setShowPassword] = useState(false);
 
     const signUpFormSchema = z.object({
         email: z.string().email( {message: 'Introduce un correo válido'}),
@@ -145,12 +148,22 @@ export const SignUpAdminCard = () => {
                             <FormItem>
                                 <FormLabel className="text-white/90">Contraseña</FormLabel>
                                 <FormControl>
-                                    <Input 
-                                        type="password" 
-                                        placeholder="••••••••" 
-                                        className="bg-black/40 border-white/20 text-white placeholder:text-white/40 focus-visible:ring-[#b91c1c]" 
-                                        {...field} 
-                                    />
+                                    <div className="relative">
+                                        <Input 
+                                            type={showPassword ? "text" : "password"} 
+                                            placeholder="••••••••" 
+                                            className="bg-black/40 border-white/20 text-white placeholder:text-white/40 focus-visible:ring-[#b91c1c] pr-11" 
+                                            {...field} 
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-white/60 hover:text-white transition-colors"
+                                            tabIndex={-1}
+                                        >
+                                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                        </button>
+                                    </div>
                                 </FormControl>
                                 <FormMessage className="text-red-400" />
                             </FormItem>

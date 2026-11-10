@@ -7,9 +7,20 @@ import WhatsAppSettings from '../profile/WhatsAppSettings.jsx';
 
 const DAYS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
+const getUserIdFromToken = (token) => {
+    if (!token) return '';
+    try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return (payload.id || payload.userId || '').toString();
+    } catch {
+        return '';
+    }
+};
+
 const AvailabilityManager = () => {
     const userInfo = useSelector((state) => state.authSlice?.userInfo || state.auth?.userInfo);
-    const myProfId = userInfo?.id?.toString() || userInfo?._id?.toString() || '';
+    const accessToken = useSelector((state) => state.authSlice?.accessToken || state.auth?.accessToken);
+    const myProfId = (userInfo?.id || userInfo?._id || userInfo?.userId || getUserIdFromToken(accessToken) || '').toString();
 
     const { data, isLoading } = useGetAvailabilityQuery(myProfId || undefined, { skip: !myProfId });
     const [saveAvailability, { isLoading: isSaving }] = useSaveAvailabilityMutation();
@@ -22,6 +33,9 @@ const AvailabilityManager = () => {
     // Map day -> array of { start_time, end_time }
     const [schedules, setSchedules] = useState({});
     const [exceptions, setExceptions] = useState([]);
+    const [newExceptionDate, setNewExceptionDate] = useState('');
+    const [newExceptionEndDate, setNewExceptionEndDate] = useState('');
+    const [newExceptionTitle, setNewExceptionTitle] = useState('');
     const [appointmentCost, setAppointmentCost] = useState('');
     const [requirePayment, setRequirePayment] = useState(false);
     const [showDisconnectModal, setShowDisconnectModal] = useState(false);
@@ -62,9 +76,15 @@ const AvailabilityManager = () => {
             const newExceptions = [];
 
             data.data.forEach(item => {
-                if (item.is_exception) {
-                    newExceptions.push({ exception_date: item.exception_date, exception_title: item.exception_title });
-                } else {
+                if (item.is_exception && item.exception_date) {
+                    const normalizedDate = typeof item.exception_date === 'string'
+                        ? item.exception_date.substring(0, 10)
+                        : new Date(item.exception_date).toISOString().substring(0, 10);
+                    newExceptions.push({
+                        exception_date: normalizedDate,
+                        exception_title: item.exception_title || 'Día cancelado'
+                    });
+                } else if (!item.is_exception) {
                     if (!newSchedules[item.day_of_week]) newSchedules[item.day_of_week] = [];
                     newSchedules[item.day_of_week].push({
                         start_time: item.start_time ? item.start_time.substring(0, 5) : '',
@@ -74,6 +94,7 @@ const AvailabilityManager = () => {
                 }
             });
 
+            newExceptions.sort((a, b) => a.exception_date.localeCompare(b.exception_date));
             setSchedules(newSchedules);
             setExceptions(newExceptions);
         }
@@ -111,15 +132,10 @@ const AvailabilityManager = () => {
         handleTimeChange(day, index, field, val);
     };
 
-    const handleSave = async () => {
-        if (!myProfId) {
-            toast({ title: 'Error', description: 'No se pudo identificar tu usuario.', variant: 'error' });
-            return;
-        }
-
+    const buildPayloadSchedules = (currentSchedules = schedules) => {
         const payloadSchedules = [];
-        Object.keys(schedules).forEach(day => {
-            schedules[day].forEach(block => {
+        Object.keys(currentSchedules).forEach(day => {
+            (currentSchedules[day] || []).forEach(block => {
                 if (block.start_time && block.end_time) {
                     payloadSchedules.push({
                         day_of_week: day,
@@ -130,6 +146,111 @@ const AvailabilityManager = () => {
                 }
             });
         });
+        return payloadSchedules;
+    };
+
+    const handleAddException = async (e) => {
+        if (e) e.preventDefault();
+        if (!newExceptionDate) {
+            toast({ title: 'Atención', description: 'Selecciona una fecha para cancelar.', variant: 'error' });
+            return;
+        }
+        if (!myProfId) {
+            toast({ title: 'Error', description: 'No se pudo identificar tu usuario.', variant: 'error' });
+            return;
+        }
+
+        const start = new Date(`${newExceptionDate}T00:00:00`);
+        const end = newExceptionEndDate ? new Date(`${newExceptionEndDate}T00:00:00`) : start;
+
+        if (end < start) {
+            toast({ title: 'Atención', description: 'La fecha final no puede ser anterior a la inicial.', variant: 'error' });
+            return;
+        }
+
+        const datesToAdd = [];
+        const current = new Date(start);
+        while (current <= end) {
+            const yyyy = current.getFullYear();
+            const mm = String(current.getMonth() + 1).padStart(2, '0');
+            const dd = String(current.getDate()).padStart(2, '0');
+            datesToAdd.push(`${yyyy}-${mm}-${dd}`);
+            current.setDate(current.getDate() + 1);
+        }
+
+        const title = newExceptionTitle.trim() || 'Día cancelado';
+        const existingMap = new Map(exceptions.map(item => [item.exception_date, item]));
+        datesToAdd.forEach(dateStr => {
+            existingMap.set(dateStr, { exception_date: dateStr, exception_title: title });
+        });
+
+        const updatedExceptions = Array.from(existingMap.values()).sort((a, b) =>
+            a.exception_date.localeCompare(b.exception_date)
+        );
+
+        setExceptions(updatedExceptions);
+        setNewExceptionDate('');
+        setNewExceptionEndDate('');
+        setNewExceptionTitle('');
+
+        try {
+            await saveAvailability({
+                schedules: buildPayloadSchedules(schedules),
+                exceptions: updatedExceptions,
+                professional_id: myProfId
+            }).unwrap();
+            toast({
+                title: 'Día cancelado',
+                description: datesToAdd.length > 1
+                    ? `Se cancelaron ${datesToAdd.length} días en tu agenda.`
+                    : 'El día seleccionado fue cancelado en tu agenda.',
+                variant: 'success'
+            });
+        } catch (err) {
+            toast({ title: 'Error', description: 'No se pudo guardar el día cancelado.', variant: 'error' });
+        }
+    };
+
+    const handleRemoveException = async (dateToRemove) => {
+        const updatedExceptions = exceptions.filter(exc => exc.exception_date !== dateToRemove);
+        setExceptions(updatedExceptions);
+
+        if (!myProfId) return;
+        try {
+            await saveAvailability({
+                schedules: buildPayloadSchedules(schedules),
+                exceptions: updatedExceptions,
+                professional_id: myProfId
+            }).unwrap();
+            toast({
+                title: 'Día habilitado',
+                description: 'La fecha vuelve a estar disponible según tu horario regular.',
+                variant: 'success'
+            });
+        } catch (err) {
+            toast({ title: 'Error', description: 'No se pudo actualizar la disponibilidad.', variant: 'error' });
+        }
+    };
+
+    const formatExceptionDate = (dateStr) => {
+        if (!dateStr) return '';
+        const [year, month, day] = dateStr.substring(0, 10).split('-').map(Number);
+        const dateObj = new Date(year, month - 1, day);
+        return dateObj.toLocaleDateString('es-AR', {
+            weekday: 'long',
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        });
+    };
+
+    const handleSave = async () => {
+        if (!myProfId) {
+            toast({ title: 'Error', description: 'No se pudo identificar tu usuario.', variant: 'error' });
+            return;
+        }
+
+        const payloadSchedules = buildPayloadSchedules(schedules);
 
         try {
             await saveAvailability({ schedules: payloadSchedules, exceptions, professional_id: myProfId }).unwrap();
@@ -258,8 +379,109 @@ const AvailabilityManager = () => {
                     </button>
                 </div>
 
-                {/* Right Column: Information/Preview */}
+                {/* Right Column: Cancelled Days & Information/Preview */}
                 <div className="flex-1 flex flex-col gap-6">
+                    {/* Cancelar Días Específicos (Excepciones por Profesional) */}
+                    <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm flex flex-col gap-4">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2 text-red-600 font-bold text-lg">
+                                <CalendarX size={20} strokeWidth={2.5} />
+                                <h2>Cancelar Días Específicos</h2>
+                            </div>
+                            {myProfileData?.name && (
+                                <span className="text-xs font-semibold bg-gray-100 text-gray-700 px-3 py-1 rounded-full">
+                                    Agenda de: {myProfileData.name}
+                                </span>
+                            )}
+                        </div>
+                        <p className="text-xs text-gray-500">
+                            Bloquea fechas puntuales o rangos (vacaciones, feriados, ausencias). Esos días no aparecerás disponible para reservas y <strong>solo afectará a tu agenda profesional</strong>.
+                        </p>
+
+                        <form onSubmit={handleAddException} className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-gray-50 p-4 rounded-xl border border-gray-100">
+                            <div>
+                                <label className="block text-xs font-bold text-gray-600 mb-1">Fecha desde *</label>
+                                <input
+                                    type="date"
+                                    value={newExceptionDate}
+                                    min={new Date().toISOString().split('T')[0]}
+                                    onChange={(e) => setNewExceptionDate(e.target.value)}
+                                    className="w-full px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg outline-none focus:border-red-500 text-gray-800 font-medium"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-gray-600 mb-1">Fecha hasta (opcional)</label>
+                                <input
+                                    type="date"
+                                    value={newExceptionEndDate}
+                                    min={newExceptionDate || new Date().toISOString().split('T')[0]}
+                                    onChange={(e) => setNewExceptionEndDate(e.target.value)}
+                                    className="w-full px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg outline-none focus:border-red-500 text-gray-800 font-medium"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-gray-600 mb-1">Motivo (opcional)</label>
+                                <input
+                                    type="text"
+                                    placeholder="Ej. Vacaciones, Feriado..."
+                                    value={newExceptionTitle}
+                                    onChange={(e) => setNewExceptionTitle(e.target.value)}
+                                    className="w-full px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg outline-none focus:border-red-500 text-gray-800"
+                                />
+                            </div>
+                            <div className="sm:col-span-3 flex justify-end">
+                                <button
+                                    type="submit"
+                                    disabled={isSaving || !newExceptionDate}
+                                    className="bg-red-600 hover:bg-red-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition-colors flex items-center gap-1.5 shadow-sm disabled:opacity-50"
+                                >
+                                    <CalendarX size={16} />
+                                    Cancelar Día(s)
+                                </button>
+                            </div>
+                        </form>
+
+                        {/* Lista de días cancelados */}
+                        <div className="flex flex-col gap-2 max-h-64 overflow-y-auto">
+                            {exceptions.length === 0 ? (
+                                <div className="text-center py-6 text-gray-400 text-sm border border-dashed border-gray-200 rounded-xl">
+                                    No tienes días cancelados actualmente.
+                                </div>
+                            ) : (
+                                exceptions.map((exc) => (
+                                    <div
+                                        key={exc.exception_date}
+                                        className="flex items-center justify-between px-4 py-3 bg-red-50/60 border border-red-100 rounded-xl"
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-lg bg-red-100 text-red-600 flex items-center justify-center shrink-0">
+                                                <CalendarX size={16} />
+                                            </div>
+                                            <div>
+                                                <p className="text-sm font-bold text-gray-900 capitalize">
+                                                    {formatExceptionDate(exc.exception_date)}
+                                                </p>
+                                                <p className="text-xs text-red-600 font-medium">
+                                                    {exc.exception_title || 'Día cancelado'} — No disponible
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => handleRemoveException(exc.exception_date)}
+                                            className="text-xs font-bold text-red-600 hover:text-white hover:bg-red-600 border border-red-200 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1"
+                                            title="Habilitar día nuevamente"
+                                        >
+                                            <Trash2 size={14} />
+                                            Habilitar
+                                        </button>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
+
                     <div className="bg-blue-50 border border-blue-100 rounded-2xl p-6">
                         <h3 className="text-blue-800 font-bold text-lg mb-2">¿Cómo funciona?</h3>
                         <p className="text-blue-600 text-sm mb-4 leading-relaxed">
@@ -268,7 +490,7 @@ const AvailabilityManager = () => {
                         <ul className="text-sm text-blue-700 list-disc pl-5 flex flex-col gap-2">
                             <li>Puedes agregar múltiples bloques de horas (ej. mañana y tarde).</li>
                             <li>Ajusta la duración (en minutos) de cada sesión para que los turnos se generen con ese intervalo exacto.</li>
-                            <li>Si un día está desmarcado, nadie podrá reservar en ese día.</li>
+                            <li>Si un día está desmarcado o agregado en <strong>Cancelar Días Específicos</strong>, no aparecerás disponible en esa fecha sin afectar al resto de profesionales.</li>
                         </ul>
                     </div>
                     

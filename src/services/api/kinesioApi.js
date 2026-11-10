@@ -66,7 +66,7 @@ export const kinesioApi = authApi.injectEndpoints({
                 method: 'PATCH',
                 body: data,
             }),
-            invalidatesTags: ['Profile']
+            invalidatesTags: ['Profile', 'Professionals']
         }),
         getProfile: build.query({
             query: () => ({
@@ -174,7 +174,7 @@ export const kinesioApi = authApi.injectEndpoints({
                 url: `/api/kinesio/availability${professional_id ? `?professional_id=${professional_id}` : ''}`, 
                 method: 'GET' 
             }),
-            providesTags: ['Availability']
+            providesTags: (result, error, arg) => [{ type: 'Availability', id: arg || 'SELF' }, 'Availability']
         }),
         saveAvailability: build.mutation({
             query: (data) => ({
@@ -182,7 +182,7 @@ export const kinesioApi = authApi.injectEndpoints({
                 method: 'POST',
                 body: data,
             }),
-            invalidatesTags: ['Availability']
+            invalidatesTags: ['Availability', 'Professionals']
         }),
         // Balance Endpoints
         getBalance: build.query({
@@ -222,19 +222,28 @@ export const kinesioApi = authApi.injectEndpoints({
         // Public Endpoints
         getPublicProfessionals: build.query({
             query: () => ({ url: '/api/public/professionals', method: 'GET' }),
+            providesTags: ['Professionals', 'Availability']
         }),
         getAvailableSlots: build.query({
             query: ({ professional_id, date, service }) => {
                 let url = `/api/public/available-slots?professional_id=${professional_id}&date=${date}`;
                 if (service) url += `&service=${service}`;
                 return { url, method: 'GET' };
-            }
+            },
+            providesTags: ['Availability', 'Appointments']
         }),
         createPublicAppointment: build.mutation({
             query: (data) => ({
                 url: '/api/public/appointments',
                 method: 'POST',
                 body: data,
+            }),
+            invalidatesTags: ['Appointments']
+        }),
+        getPublicAppointmentStatus: build.query({
+            query: ({ id, payment_id }) => ({
+                url: `/api/public/appointments/${id}/status${payment_id ? `?payment_id=${payment_id}` : ''}`,
+                method: 'GET'
             })
         }),
         getWhatsappStatus: build.query({
@@ -350,6 +359,7 @@ export const {
     useGetPublicProfessionalsQuery,
     useGetAvailableSlotsQuery,
     useCreatePublicAppointmentMutation,
+    useGetPublicAppointmentStatusQuery,
     useGetBalanceQuery,
     useCreateTransactionMutation,
     useGetTransactionHistoryQuery,

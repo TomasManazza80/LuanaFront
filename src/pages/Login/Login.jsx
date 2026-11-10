@@ -1,11 +1,11 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { NavLink, useNavigate } from "react-router-dom";
 import axios from "axios";
 import * as Yup from "yup";
 import authContext from "../../store/store";
-import { FiMail, FiLock, FiArrowRight, FiActivity } from "react-icons/fi";
+import { FiMail, FiLock, FiArrowRight, FiActivity, FiEye, FiEyeOff } from "react-icons/fi";
 import { motion } from "framer-motion";
 
 import logo from "../../images/ai_logo.png";
@@ -14,6 +14,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 function Login() {
   const navigate = useNavigate();
   const authCtx = useContext(authContext);
+  const [showPassword, setShowPassword] = useState(false);
 
   const initialValues = {
     email: "",
@@ -128,11 +129,19 @@ function Login() {
                       <FiLock size={18} className="text-gray-400 group-focus-within:text-[#b273c2]" />
                     </div>
                     <Field
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       name="password"
-                      className="w-full bg-[#f8f3f6] border border-[#f0dff3] rounded-2xl py-3.5 pl-12 pr-4 text-[#1d1d1d] font-medium text-sm focus:border-[#b273c2] focus:ring-2 focus:ring-[#b273c2]/20 focus:outline-none transition-all placeholder:text-gray-400 tracking-widest"
+                      className={`w-full bg-[#f8f3f6] border border-[#f0dff3] rounded-2xl py-3.5 pl-12 pr-12 text-[#1d1d1d] font-medium text-sm focus:border-[#b273c2] focus:ring-2 focus:ring-[#b273c2]/20 focus:outline-none transition-all placeholder:text-gray-400 ${showPassword ? "" : "tracking-widest"}`}
                       placeholder="••••••••"
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-[#b273c2] transition-colors"
+                      tabIndex={-1}
+                    >
+                      {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                    </button>
                   </div>
                   <ErrorMessage
                     name="password"

@@ -7,12 +7,14 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {Button} from "../ui/button.tsx";
 import {useNavigate} from "react-router-dom";
 import PublicAuthLayout from "./PublicAuthLayout.jsx";
-import { Loader2 } from "lucide-react";
+import { Loader2, Eye, EyeOff } from "lucide-react";
+import { useState } from "react";
 
 export const SignUpCard = () => {
     const navigate = useNavigate();
     const [register, {isLoading}] = useRegisterMutation();
     const [login, {isLoading: loginIsLoading }] = useLoginMutation();
+    const [showPassword, setShowPassword] = useState(false);
 
     const signUpFormSchema = z.object({
         email: z.string().email( {message: 'Introduce un correo válido'}),
@@ -146,12 +148,22 @@ export const SignUpCard = () => {
                             <FormItem>
                                 <FormLabel className="text-[#3D1A20] font-bold text-xs uppercase tracking-wider">Contraseña</FormLabel>
                                 <FormControl>
-                                    <Input 
-                                        type="password" 
-                                        placeholder="••••••••" 
-                                        className="bg-[#F3ECE7] border-[#E5D8CC] text-[#3D1A20] placeholder:text-[#3D1A20]/40 focus-visible:ring-[#3D1A20] focus-visible:border-[#3D1A20] rounded-xl px-4 py-3 h-auto shadow-inner tracking-widest" 
-                                        {...field} 
-                                    />
+                                    <div className="relative">
+                                        <Input 
+                                            type={showPassword ? "text" : "password"} 
+                                            placeholder="••••••••" 
+                                            className={`bg-[#F3ECE7] border-[#E5D8CC] text-[#3D1A20] placeholder:text-[#3D1A20]/40 focus-visible:ring-[#3D1A20] focus-visible:border-[#3D1A20] rounded-xl pl-4 pr-11 py-3 h-auto shadow-inner ${showPassword ? "" : "tracking-widest"}`} 
+                                            {...field} 
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-[#3D1A20]/60 hover:text-[#3D1A20] transition-colors"
+                                            tabIndex={-1}
+                                        >
+                                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                        </button>
+                                    </div>
                                 </FormControl>
                                 <FormMessage className="text-red-500 text-xs" />
                             </FormItem>

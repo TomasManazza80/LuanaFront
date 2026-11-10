@@ -13,6 +13,7 @@ import SocketContext from "./services/contexts/SocketContext.js";
 import {ThemeProvider} from "./services/contexts/ThemeContext.tsx";
 import SmoothScroll from "./components/ui/SmoothScroll.jsx";
 import BookingPage from "./pages/public/BookingPage.jsx";
+import BookingReturnPage from "./pages/public/BookingReturnPage.jsx";
 import MyAppointments from "./components/kinesio/MyAppointments.jsx";
 import Products from "./pages/Products/index.jsx";
 import HOME from "./pages/Home/index.jsx";
@@ -65,7 +66,7 @@ const AppContent = () => {
         return () => clearTimeout(timer);
     }, []);
 
-    const isPublicRoute = location.pathname === '/' || location.pathname === '/cart' || location.pathname === '/login' || location.pathname === '/signup' || location.pathname === '/signup-admin' || location.pathname === '/reservar' || location.pathname === '/mis-turnos' || location.pathname === '/mis-cursos' || location.pathname.startsWith('/productos') || location.pathname.startsWith('/product/') || location.pathname.startsWith('/producto/') || location.pathname.startsWith('/curso/');
+    const isPublicRoute = location.pathname === '/' || location.pathname === '/cart' || location.pathname === '/login' || location.pathname === '/signup' || location.pathname === '/signup-admin' || location.pathname === '/reservar' || location.pathname.startsWith('/turnos/') || location.pathname === '/mis-turnos' || location.pathname === '/mis-cursos' || location.pathname.startsWith('/productos') || location.pathname.startsWith('/product/') || location.pathname.startsWith('/producto/') || location.pathname.startsWith('/curso/');
     const showNavbar = !isPublicRoute;
 
     const token = useSelector(state => state.authSlice.accessToken)
@@ -101,6 +102,9 @@ const AppContent = () => {
                         <Route path="/signup" element={<PageTransition><SignUpCard/></PageTransition>}/>
                         <Route path="/signup-admin" element={<PageTransition><SignUpAdminCard/></PageTransition>}/>
                         <Route path="/reservar" element={<PageTransition><BookingPage/></PageTransition>} />
+                        <Route path="/turnos/exito" element={<PageTransition><BookingReturnPage/></PageTransition>} />
+                        <Route path="/turnos/error" element={<PageTransition><BookingReturnPage/></PageTransition>} />
+                        <Route path="/turnos/pendiente" element={<PageTransition><BookingReturnPage/></PageTransition>} />
                         <Route path="/mis-turnos" element={<PageTransition><MyAppointments/></PageTransition>} />
                         <Route path="/mis-cursos" element={<PageTransition><MisCursos/></PageTransition>} />
                         <Route path="/productos" element={<PageTransition><Products/></PageTransition>} />

@@ -15,6 +15,9 @@ export default function UserProfile() {
     email: '',
     specialty: '',
     session_fee: '',
+    requires_deposit: false,
+    deposit_amount: '',
+    payment_timeout_minutes: 15,
     mp_access_token: '',
     is_public: true
   });
@@ -27,6 +30,9 @@ export default function UserProfile() {
         email: user.email || '',
         specialty: user.specialty || '',
         session_fee: user.session_fee !== undefined && user.session_fee !== null ? user.session_fee : '',
+        requires_deposit: Boolean(user.requires_deposit ?? user.require_payment ?? false),
+        deposit_amount: user.deposit_amount !== undefined && user.deposit_amount !== null ? user.deposit_amount : (user.session_fee || ''),
+        payment_timeout_minutes: user.payment_timeout_minutes || 15,
         mp_access_token: user.mp_access_token || '',
         is_public: user.is_public !== undefined ? user.is_public : true
       });
@@ -48,8 +54,13 @@ export default function UserProfile() {
         name: formData.name,
         specialty: formData.specialty,
         session_fee: formData.session_fee ? Number(formData.session_fee) : 0,
+        requires_deposit: Boolean(formData.requires_deposit),
+        require_payment: Boolean(formData.requires_deposit),
+        deposit_amount: formData.deposit_amount ? Number(formData.deposit_amount) : 0,
+        payment_timeout_minutes: formData.payment_timeout_minutes ? Number(formData.payment_timeout_minutes) : 15,
         mp_access_token: formData.mp_access_token,
-        is_public: formData.is_public
+        is_public: formData.is_public,
+        apply_deposit_globally: true
       }).unwrap();
 
       toast({ title: 'Perfil Actualizado', description: 'Tus datos de usuario han sido guardados correctamente.', variant: 'success' });
@@ -199,6 +210,69 @@ export default function UserProfile() {
                     placeholder="Ej. 15000"
                   />
                 </div>
+              </div>
+
+              {/* Deposit Configuration Section */}
+              <div className="md:col-span-2 p-5 bg-blue-50/50 rounded-2xl border border-blue-100 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="text-sm font-bold text-gray-900">Cobro de Seña Obligatoria (Mercado Pago)</h4>
+                    <p className="text-xs text-gray-500">
+                      Si está activo, el paciente deberá abonar la seña online para confirmar el turno. Si está desactivado, podrá reservar sin pagar.
+                    </p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      name="requires_deposit"
+                      checked={formData.requires_deposit}
+                      onChange={handleChange}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0A58CA]"></div>
+                  </label>
+                </div>
+
+                {formData.requires_deposit && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-blue-100">
+                    <div className="space-y-1.5">
+                      <label className="block text-xs font-bold text-gray-600 uppercase tracking-wider">
+                        Monto de la Seña ($ ARS)
+                      </label>
+                      <div className="relative">
+                        <DollarSign size={18} className="absolute left-3.5 top-3 text-gray-400" />
+                        <input
+                          type="number"
+                          name="deposit_amount"
+                          value={formData.deposit_amount}
+                          onChange={handleChange}
+                          min="1"
+                          step="100"
+                          required={formData.requires_deposit}
+                          className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-semibold text-gray-900 focus:ring-2 focus:ring-[#0A58CA] outline-none"
+                          placeholder="Ej. 5000"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="block text-xs font-bold text-gray-600 uppercase tracking-wider">
+                        Tiempo límite para pagar (Minutos)
+                      </label>
+                      <input
+                        type="number"
+                        name="payment_timeout_minutes"
+                        value={formData.payment_timeout_minutes}
+                        onChange={handleChange}
+                        min="5"
+                        max="120"
+                        required={formData.requires_deposit}
+                        className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-semibold text-gray-900 focus:ring-2 focus:ring-[#0A58CA] outline-none"
+                        placeholder="15"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Mercado Pago Access Token */}

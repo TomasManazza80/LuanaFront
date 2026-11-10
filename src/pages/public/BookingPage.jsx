@@ -295,7 +295,8 @@ export default function BookingPage() {
                                         <div className="grid grid-cols-5 gap-2 md:gap-3">
                                             {days.map((d) => {
                                                 const isSelected = selectedDate?.date === d.date;
-                                                const isBlocked = d.isPast;
+                                                const isCancelledDay = (selectedSpecialist?.cancelled_dates || []).includes(d.date);
+                                                const isBlocked = d.isPast || isCancelledDay;
                                                 return (
                                                     <button 
                                                         key={d.date} 
@@ -309,6 +310,11 @@ export default function BookingPage() {
                                                     >
                                                         <span className={`text-[10px] md:text-xs font-bold uppercase tracking-widest mb-1 ${isSelected ? 'text-gray-300' : 'text-gray-500'}`}>{d.dayShort}</span>
                                                         <span className="text-xl md:text-2xl font-extrabold">{d.displayNum}</span>
+                                                        {isCancelledDay && (
+                                                            <span className="text-[9px] font-bold text-red-600 uppercase tracking-tight mt-0.5">
+                                                                No disp.
+                                                            </span>
+                                                        )}
                                                         {isBlocked && <div className="absolute w-full h-px bg-gray-400 rotate-45 transform origin-center opacity-50"></div>}
                                                     </button>
                                                 );
@@ -426,6 +432,20 @@ export default function BookingPage() {
                                                     </div>
                                                 </div>
                                             </div>
+
+                                            {selectedSpecialist?.requires_deposit && Number(selectedSpecialist?.deposit_amount) > 0 && (
+                                                <div className="mt-4 bg-blue-500/15 border border-blue-400/30 rounded-2xl p-4 text-left">
+                                                    <div className="flex items-center justify-between mb-1">
+                                                        <span className="text-xs font-bold uppercase tracking-wider text-blue-300">Seña obligatoria para confirmar</span>
+                                                        <span className="text-lg font-extrabold text-white">
+                                                            ${Number(selectedSpecialist.deposit_amount).toLocaleString('es-AR')} ARS
+                                                        </span>
+                                                    </div>
+                                                    <p className="text-xs text-gray-300">
+                                                        Al continuar serás redirigido a Mercado Pago. Tu horario quedará reservado temporalmente por {selectedSpecialist.payment_timeout_minutes || 15} minutos hasta completar el pago.
+                                                    </p>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -536,6 +556,18 @@ export default function BookingPage() {
                                         </div>
                                     </div>
                                     
+                                    {selectedSpecialist?.requires_deposit && Number(selectedSpecialist?.deposit_amount) > 0 && (
+                                        <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl flex items-center justify-between">
+                                            <div>
+                                                <p className="text-xs font-bold text-blue-900 uppercase tracking-wider">Monto de Seña a Abonar</p>
+                                                <p className="text-xs text-blue-700">Pago seguro vía Mercado Pago Checkout Pro</p>
+                                            </div>
+                                            <span className="text-lg font-extrabold text-blue-900">
+                                                ${Number(selectedSpecialist.deposit_amount).toLocaleString('es-AR')} ARS
+                                            </span>
+                                        </div>
+                                    )}
+
                                     <div className="flex gap-3 pt-6 mt-2 border-t border-gray-100">
                                         <button 
                                             type="button"
@@ -549,7 +581,13 @@ export default function BookingPage() {
                                             disabled={isCreating}
                                             className="flex-1 bg-gray-900 text-white rounded-xl font-bold py-4 hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-gray-900/20 disabled:opacity-70"
                                         >
-                                            {isCreating ? <Loader2 className="animate-spin w-5 h-5"/> : 'Finalizar Reserva'}
+                                            {isCreating ? (
+                                                <Loader2 className="animate-spin w-5 h-5"/>
+                                            ) : selectedSpecialist?.requires_deposit && Number(selectedSpecialist?.deposit_amount) > 0 ? (
+                                                `Pagar Seña ($${Number(selectedSpecialist.deposit_amount).toLocaleString('es-AR')})`
+                                            ) : (
+                                                'Finalizar Reserva'
+                                            )}
                                         </button>
                                     </div>
                                 </form>

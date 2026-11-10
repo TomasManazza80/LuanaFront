@@ -61,6 +61,10 @@ const AppointmentCalendar = () => {
 
     const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
     const [configData, setConfigData] = useState({
+        requires_deposit: false,
+        deposit_amount: 0,
+        payment_timeout_minutes: 15,
+        mp_access_token: '',
         whatsapp_reminder_minutes: 60,
         whatsapp_creation_template: 'Hola {{patient_name}}, tu turno para {{service}} ha sido reservado para el día {{date}} a las {{time}} hs.',
         whatsapp_reminder_template: 'Hola {{patient_name}}, te recordamos tu turno de {{service}} para hoy a las {{time}} hs.'
@@ -77,6 +81,27 @@ const AppointmentCalendar = () => {
     const professionals = professionalsData?.data || [];
     const activeProfessionalId = (['ADMIN', 'EMPLOYEE'].includes(user?.role) && selectedProfessional) ? selectedProfessional : user?.id;
 
+    const { data: availabilityData } = useGetAvailabilityQuery(activeProfessionalId, { skip: !activeProfessionalId });
+    const cancelledDatesSet = React.useMemo(() => {
+        const set = new Set();
+        (availabilityData?.data || []).forEach(item => {
+            if (item.is_exception && item.exception_date && !item.start_time) {
+                const dateStr = typeof item.exception_date === 'string'
+                    ? item.exception_date.substring(0, 10)
+                    : new Date(item.exception_date).toISOString().substring(0, 10);
+                set.add(dateStr);
+            }
+        });
+        return set;
+    }, [availabilityData]);
+
+    const formatDateKey = (d) => {
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+    };
+
     const { data: profileData } = useGetProfileQuery(undefined, { skip: !user });
     const [updateProfile, { isLoading: isUpdatingProfile }] = useUpdateProfileMutation();
 
@@ -84,6 +109,10 @@ const AppointmentCalendar = () => {
     React.useEffect(() => {
         if (profileData?.data) {
             setConfigData({
+                requires_deposit: Boolean(profileData.data.requires_deposit ?? profileData.data.require_payment ?? false),
+                deposit_amount: Number(profileData.data.deposit_amount ?? profileData.data.session_fee ?? 0),
+                payment_timeout_minutes: Number(profileData.data.payment_timeout_minutes || 15),
+                mp_access_token: profileData.data.mp_access_token || '',
                 whatsapp_reminder_minutes: profileData.data.whatsapp_reminder_minutes || 60,
                 whatsapp_creation_template: profileData.data.whatsapp_creation_template || 'Hola {{patient_name}}, tu turno para {{service}} ha sido reservado para el día {{date}} a las {{time}} hs.',
                 whatsapp_reminder_template: profileData.data.whatsapp_reminder_template || 'Hola {{patient_name}}, te recordamos tu turno de {{service}} para hoy a las {{time}} hs.'
@@ -115,7 +144,7 @@ const AppointmentCalendar = () => {
     const handleCancelAppointment = async (id) => {
         if (!window.confirm('¿Estás seguro de que deseas cancelar este turno?')) return;
         try {
-            await updateAppointment({ id, estado: 'cancelado' }).unwrap();
+            await updateAppointment({ id, estado: 'CANCELLED' }).unwrap();
             toast({ title: 'Éxito', description: 'Turno cancelado correctamente' });
             setSelectedApptDetail(null);
             if (isListModalOpen) setIsListModalOpen(false);
@@ -158,8 +187,15 @@ const AppointmentCalendar = () => {
     const handleSaveConfig = async (e) => {
         e.preventDefault();
         try {
-            await updateProfile(configData).unwrap();
-            toast({ title: 'Éxito', description: 'Configuración guardada correctamente.' });
+            await updateProfile({
+                ...configData,
+                requires_deposit: Boolean(configData.requires_deposit),
+                require_payment: Boolean(configData.requires_deposit),
+                deposit_amount: Number(configData.deposit_amount || 0),
+                payment_timeout_minutes: Number(configData.payment_timeout_minutes || 15),
+                apply_deposit_globally: true
+            }).unwrap();
+            toast({ title: 'Éxito', description: 'Configuración de turnos y seña guardada correctamente.' });
             setIsConfigModalOpen(false);
         } catch (error) {
             toast({ title: 'Error', description: 'No se pudo guardar la configuración.', variant: 'destructive' });
@@ -223,14 +259,42 @@ const AppointmentCalendar = () => {
         })
         : [currentDate];
 
+    const getAppointmentBadgeInfo = (appt) => {
+        const st = (appt.estado || '').toUpperCase();
+        const hasDeposit = Number(appt.deposit_amount_paid) > 0 || Boolean(appt.mp_payment_id || appt.payment_id);
+        if (st === 'PENDING_PAYMENT' || st === 'PENDIENTE_PAGO') {
+            return { label: 'Pendiente de pago', className: 'bg-amber-100 text-amber-800 border-amber-300' };
+        }
+        if (st === 'CONFIRMED' || st === 'CONFIRMADO' || st === 'PENDIENTE') {
+            if (hasDeposit) {
+                return { label: 'Confirmado (Señado)', className: 'bg-emerald-100 text-emerald-800 border-emerald-300' };
+            }
+            return { label: 'Confirmado', className: 'bg-blue-100 text-blue-800 border-blue-200' };
+        }
+        if (st === 'COMPLETADO' || st === 'COMPLETED') {
+            return { label: 'Completado', className: 'bg-green-100 text-green-800 border-green-200' };
+        }
+        if (st === 'EXPIRED' || st === 'EXPIRADO') {
+            return { label: 'Expirado', className: 'bg-gray-100 text-gray-600 border-gray-200' };
+        }
+        if (st === 'CANCELLED' || st === 'CANCELADO') {
+            return { label: 'Cancelado', className: 'bg-red-100 text-red-700 border-red-200' };
+        }
+        return { label: appt.estado || 'Confirmado', className: 'bg-blue-100 text-blue-800 border-blue-200' };
+    };
+
     const appointmentsByDay = Array.from({ length: displayDays.length }, () => []);
     if (appointments && Array.isArray(appointments)) {
         appointments.forEach(appt => {
             if (!appt.fecha_hora) return;
-            if (appt.estado === 'cancelado') return;
+            const st = (appt.estado || '').toUpperCase();
+            if (st === 'CANCELADO' || st === 'CANCELLED' || st === 'EXPIRED' || st === 'EXPIRADO') return;
 
             // Filters
-            if (statusFilter && appt.estado !== statusFilter) return;
+            if (statusFilter) {
+                if (statusFilter === 'confirmado' && !['CONFIRMED', 'CONFIRMADO', 'PENDIENTE'].includes(st)) return;
+                if (statusFilter === 'PENDING_PAYMENT' && !['PENDING_PAYMENT', 'PENDIENTE_PAGO'].includes(st)) return;
+            }
             if (searchQuery) {
                 const patientName = appt.patient?.nombre?.toLowerCase() || '';
                 if (!patientName.includes(searchQuery.toLowerCase())) return;
@@ -359,6 +423,7 @@ const AppointmentCalendar = () => {
         const color = colors[appt.id % colors.length] || colors[0];
 
         const patientName = appt.patient ? appt.patient.nombre : '';
+        const badgeInfo = getAppointmentBadgeInfo(appt);
 
         return (
             <div key={appt.id} className="absolute left-2 right-2 p-2 rounded-xl shadow-sm border overflow-hidden hover:shadow-md transition-shadow cursor-pointer z-20"
@@ -369,19 +434,24 @@ const AppointmentCalendar = () => {
                     backgroundColor: color.bg,
                     borderColor: color.border
                 }}>
-                <div className="flex justify-between items-start">
+                <div className="flex justify-between items-start gap-1">
                     <div className="text-sm font-bold truncate" style={{ color: color.text }}>{appt.motivo || 'Turno'}</div>
                     <button
                         onClick={(e) => { e.stopPropagation(); handleCompleteAppointment(appt.id); }}
-                        className={`p-1 rounded-full transition-colors ${appt.estado === 'completado' ? 'text-green-600 bg-green-100' : 'text-gray-400 hover:text-green-600 hover:bg-white/50'}`}
+                        className={`p-1 rounded-full transition-colors shrink-0 ${appt.estado === 'completado' ? 'text-green-600 bg-green-100' : 'text-gray-400 hover:text-green-600 hover:bg-white/50'}`}
                         title="Marcar como completado"
                     >
                         <Check size={14} />
                     </button>
                 </div>
                 {patientName && <div className="text-xs font-semibold truncate" style={{ color: color.text }}>{patientName}</div>}
-                <div className="text-xs font-medium mt-0.5" style={{ color: color.timeText }}>
-                    {date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                <div className="flex items-center justify-between gap-1 mt-0.5">
+                    <span className="text-xs font-medium" style={{ color: color.timeText }}>
+                        {date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                    <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full border truncate ${badgeInfo.className}`}>
+                        {badgeInfo.label}
+                    </span>
                 </div>
             </div>
         );
@@ -567,13 +637,21 @@ const AppointmentCalendar = () => {
 
                             {/* Absolute Day Headers */}
                             <div className="absolute top-0 left-12 right-0 h-12 flex divide-x divide-gray-300 border-b border-gray-300 bg-white/90 backdrop-blur-sm z-30">
-                                {displayDays.map((day, i) => (
-                                    <div key={i} className="flex-1 flex flex-col items-center justify-center">
-                                        <span className={`text-[10px] font-bold uppercase tracking-wider ${day.toDateString() === new Date().toDateString() ? 'text-blue-600' : 'text-gray-800'}`}>
-                                            {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'][day.getDay()]} {day.getDate()}
-                                        </span>
-                                    </div>
-                                ))}
+                                {displayDays.map((day, i) => {
+                                    const isCancelled = cancelledDatesSet.has(formatDateKey(day));
+                                    return (
+                                        <div key={i} className={`flex-1 flex flex-col items-center justify-center ${isCancelled ? 'bg-red-50/80' : ''}`}>
+                                            <span className={`text-[10px] font-bold uppercase tracking-wider ${isCancelled ? 'text-red-600 line-through' : day.toDateString() === new Date().toDateString() ? 'text-blue-600' : 'text-gray-800'}`}>
+                                                {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'][day.getDay()]} {day.getDate()}
+                                            </span>
+                                            {isCancelled && (
+                                                <span className="text-[8px] font-bold uppercase text-red-600 leading-none">
+                                                    Cancelado
+                                                </span>
+                                            )}
+                                        </div>
+                                    );
+                                })}
                             </div>
 
                             {/* Absolute Time Labels (Left) */}
@@ -735,14 +813,25 @@ const AppointmentCalendar = () => {
                             <button onClick={() => setSelectedApptDetail(null)} className="text-gray-400 hover:text-gray-600"><X size={20} /></button>
                         </div>
                         <div className="p-5 flex flex-col gap-4">
-                            <div>
-                                <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Cliente</p>
-                                <p className="text-base font-semibold text-gray-900">{selectedApptDetail.patient?.nombre || 'Sin nombre'}</p>
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Cliente</p>
+                                    <p className="text-base font-semibold text-gray-900">{selectedApptDetail.patient?.nombre || 'Sin nombre'}</p>
+                                </div>
+                                <span className={`text-xs font-bold px-3 py-1 rounded-full border ${getAppointmentBadgeInfo(selectedApptDetail).className}`}>
+                                    {getAppointmentBadgeInfo(selectedApptDetail).label}
+                                </span>
                             </div>
                             <div>
                                 <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Motivo</p>
                                 <p className="text-base font-semibold text-gray-900">{selectedApptDetail.motivo || 'No especificado'}</p>
                             </div>
+                            {Number(selectedApptDetail.deposit_amount_paid) > 0 && (
+                                <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 flex justify-between items-center">
+                                    <span className="text-xs font-bold text-emerald-800 uppercase">Seña Abonada (MP)</span>
+                                    <span className="text-sm font-extrabold text-emerald-900">${Number(selectedApptDetail.deposit_amount_paid).toLocaleString('es-AR')} ARS</span>
+                                </div>
+                            )}
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Inicio</p>
@@ -812,8 +901,8 @@ const AppointmentCalendar = () => {
                                             <p className="text-xs text-gray-500">{parseDateString(appt.fecha_hora).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {appt.motivo}</p>
                                         </div>
                                         <div className="flex items-center gap-2">
-                                            <span className={`text-xs px-2 py-1 rounded-full ${appt.estado === 'completado' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>
-                                                {appt.estado || 'Confirmado'}
+                                            <span className={`text-xs font-bold px-2.5 py-1 rounded-full border ${getAppointmentBadgeInfo(appt).className}`}>
+                                                {getAppointmentBadgeInfo(appt).label}
                                             </span>
                                             <button
                                                 onClick={(e) => { e.stopPropagation(); handleCompleteAppointment(appt.id); }}
@@ -834,12 +923,76 @@ const AppointmentCalendar = () => {
             {/* Modal Configuración de Turnos */}
             {isConfigModalOpen && (
                 <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
-                    <div className="bg-white rounded-2xl shadow-xl w-[500px] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                    <div className="bg-white rounded-2xl shadow-xl w-[540px] max-w-[95vw] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                         <div className="flex justify-between items-center p-4 border-b border-gray-100">
-                            <h3 className="font-bold text-lg text-gray-900 flex items-center gap-2"><Settings size={18} /> Configuración de Turnos</h3>
+                            <h3 className="font-bold text-lg text-gray-900 flex items-center gap-2"><Settings size={18} /> Configuración de Turnos y Señas</h3>
                             <button onClick={() => setIsConfigModalOpen(false)} className="text-gray-400 hover:text-gray-600"><X size={20} /></button>
                         </div>
-                        <form onSubmit={handleSaveConfig} className="p-4 flex flex-col gap-4 max-h-[70vh] overflow-y-auto">
+                        <form onSubmit={handleSaveConfig} className="p-4 flex flex-col gap-4 max-h-[75vh] overflow-y-auto">
+                            {/* Sección Cobro de Seña */}
+                            <div className="p-4 bg-blue-50/60 border border-blue-100 rounded-xl flex flex-col gap-3">
+                                <div className="flex items-center justify-between gap-3">
+                                    <div>
+                                        <p className="text-sm font-bold text-gray-900">Cobrar Seña Obligatoria al Reservar Turno</p>
+                                        <p className="text-xs text-gray-500">
+                                            {configData.requires_deposit
+                                                ? 'Activo: los pacientes deben abonar la seña por Mercado Pago para confirmar su turno.'
+                                                : 'Inactivo: los pacientes pueden reservar su turno directamente sin pagar.'}
+                                        </p>
+                                    </div>
+                                    <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                                        <input
+                                            type="checkbox"
+                                            className="sr-only peer"
+                                            checked={Boolean(configData.requires_deposit)}
+                                            onChange={(e) => setConfigData({ ...configData, requires_deposit: e.target.checked })}
+                                        />
+                                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0A58CA]"></div>
+                                    </label>
+                                </div>
+
+                                {configData.requires_deposit && (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3 border-t border-blue-100">
+                                        <div>
+                                            <label className="block text-xs font-bold text-gray-700 mb-1">Monto de la Seña ($ ARS)</label>
+                                            <input
+                                                type="number"
+                                                min="1"
+                                                step="100"
+                                                required={configData.requires_deposit}
+                                                className="w-full border border-gray-200 rounded-lg p-2 text-sm bg-white focus:outline-none focus:border-blue-500 font-semibold"
+                                                value={configData.deposit_amount}
+                                                onChange={(e) => setConfigData({ ...configData, deposit_amount: e.target.value })}
+                                                placeholder="Ej. 5000"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-bold text-gray-700 mb-1">Expiración de reserva (min)</label>
+                                            <input
+                                                type="number"
+                                                min="5"
+                                                max="120"
+                                                required={configData.requires_deposit}
+                                                className="w-full border border-gray-200 rounded-lg p-2 text-sm bg-white focus:outline-none focus:border-blue-500 font-semibold"
+                                                value={configData.payment_timeout_minutes}
+                                                onChange={(e) => setConfigData({ ...configData, payment_timeout_minutes: parseInt(e.target.value) || 15 })}
+                                                placeholder="15"
+                                            />
+                                        </div>
+                                        <div className="sm:col-span-2">
+                                            <label className="block text-xs font-bold text-gray-700 mb-1">Mercado Pago Access Token (Opcional si ya está en servidor)</label>
+                                            <input
+                                                type="password"
+                                                className="w-full border border-gray-200 rounded-lg p-2 text-sm bg-white focus:outline-none focus:border-blue-500"
+                                                value={configData.mp_access_token}
+                                                onChange={(e) => setConfigData({ ...configData, mp_access_token: e.target.value })}
+                                                placeholder="APP_USR-..."
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
                             <div>
                                 <label className="block text-sm font-semibold text-gray-700 mb-1">Anticipación del Recordatorio (Automático)</label>
                                 <p className="text-xs text-gray-500 mb-2">Selecciona cuánto tiempo antes del turno deseas enviar el recordatorio automático por WhatsApp.</p>
